@@ -34,5 +34,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "main": "index.js",
+  "repository": "https://umarees310@bitbucket.org/officechat/pcs.git",
+  "author": "Umakani <umakani310@gmail.com>",
+  "license": "MIT"
 }
