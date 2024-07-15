@@ -1,10 +1,12 @@
 
 import './App.css';
-import PrimarySearchAppBar from './components/chatpage/header.tsx'
+import Header from './components/chatpage/header.tsx'
+import Sidemenu from './components/chatpage/sidemenu.tsx'
 function App() {
   return (
     <div className="App">
-      <PrimarySearchAppBar />
+      <Header />
+      <Sidemenu />
     </div>
   );
 }
