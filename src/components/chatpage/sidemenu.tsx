@@ -92,6 +92,7 @@ const HomeContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, on
     <Box sx={{ display: 'flex' }}>
       <Box sx={{ flex: 1 }}>
         <Typography variant="h5">Customers</Typography>
+        <h1>Abishck</h1>
         <List>
           {customers.map((customer) => (
             <ListItem button key={customer.id} onClick={() => onSelect(customer)}>
