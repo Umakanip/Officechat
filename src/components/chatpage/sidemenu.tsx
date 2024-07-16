@@ -64,11 +64,11 @@
 
 // export default App;
 
-
-
 import React, { useState } from 'react';
-import { Drawer, List, ListItem, ListItemText, Box, AppBar, Toolbar, Typography, CssBaseline, Divider } from '@mui/material';
+import { FaBell, FaUsers, FaComments } from "react-icons/fa";
+import { Drawer, List, ListItem, ListItemText, Box, AppBar, Toolbar, Typography, CssBaseline, Divider, Icon } from '@mui/material';
 import Chatmessage from './chatmessage.tsx';
+import ContactList from './ContactList.tsx'; // Import the ContactList component
 
 interface Item {
   id: number;
@@ -76,9 +76,8 @@ interface Item {
   details: string | React.ReactElement;
 }
 
-
 // Define content components
-const HomeContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, onSelect: (item: Item) => void }) => {
+const ActivityContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, onSelect: (item: Item) => void }) => {
   const allMsg = [" "]; // Your messages data
   const user = { name: 'John Doe' }; // Your user data
   const handleDelete = (id: number) => { /* Your delete logic */ };
@@ -91,8 +90,7 @@ const HomeContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, on
   return (
     <Box sx={{ display: 'flex' }}>
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h5">Customers</Typography>
-        <h1>Abishck</h1>
+        <Typography variant="h5">Active Users</Typography>
         <List>
           {customers.map((customer) => (
             <ListItem button key={customer.id} onClick={() => onSelect(customer)}>
@@ -111,16 +109,16 @@ const HomeContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, on
   );
 };
 
-const AboutContent = () => (
-  <Box>
-    <Typography variant="h5">About Us</Typography>
+const ChatContent = () => (
+  <Box sx={{ flexGrow: 1 }}>
+    <Typography variant="h5">Chat page</Typography>
     <Typography variant="body1">
       This is the about page content. It contains information about the application or company.
     </Typography>
   </Box>
 );
 
-const ContactContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, onSelect: (item: Item) => void }) => {
+const TeamsContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, onSelect: (item: Item) => void }) => {
   const contacts: Item[] = [
     { id: 1, name: 'Contact 1', details: 'Details about Contact 1' },
     { id: 2, name: 'Contact 2', details: 'Details about Contact 2' },
@@ -130,7 +128,7 @@ const ContactContent = ({ selectedItem, onSelect }: { selectedItem: Item | null,
   return (
     <Box sx={{ display: 'flex' }}>
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h5">Contacts</Typography>
+        <Typography variant="h5">Teams</Typography>
         <List>
           {contacts.map((contact) => (
             <ListItem button key={contact.id} onClick={() => onSelect(contact)}>
@@ -149,18 +147,17 @@ const ContactContent = ({ selectedItem, onSelect }: { selectedItem: Item | null,
   );
 };
 
-
 const menuItems = [
-  { text: 'Home', component: 'home' },
-  { text: 'About', component: 'about' },
-  { text: 'Contact', component: 'contact' },
+  { text: 'Activity', component: 'activity', icon: <FaBell /> },
+  { text: 'Chat', component: 'chat', icon: <FaComments /> },
+  { text: 'Teams', component: 'teams', icon: <FaUsers /> },
 ];
 
-const drawerWidth = 240;
+const drawerWidth = 80; // Decrease the size of the sidebar
 
 const App: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [selectedComponent, setSelectedComponent] = useState<string>('home');
+  const [selectedComponent, setSelectedComponent] = useState<string>('activity');
 
   const handleSelectItem = (item: Item) => {
     setSelectedItem(item);
@@ -173,22 +170,21 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (selectedComponent) {
-      case 'home':
-        return <HomeContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
-      case 'about':
-        return <AboutContent />;
-      case 'contact':
-        return <ContactContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
+      case 'activity':
+        return <ActivityContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
+      case 'chat':
+        return <ChatContent />;
+      case 'teams':
+        return <TeamsContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
       default:
-        return <HomeContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
+        return <ActivityContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
     }
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ width: "100%",
-          ml: { sm: `${drawerWidth}px` },zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" sx={{ width: "100%", ml: { sm: `${drawerWidth}px` }, zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap>
             My Application
@@ -202,27 +198,34 @@ const App: React.FC = () => {
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
         }}
-        
       >
         <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
+        <Box sx={{ overflow: 'auto', bgcolor: '#c0c0c0' }}>
           <List>
             {menuItems.map((item, index) => (
-              <ListItem button key={index} onClick={() => handleMenuItemClick(item.component)}>
-                <ListItemText primary={item.text} />
+              <ListItem
+                button
+                key={index}
+                onClick={() => handleMenuItemClick(item.component)}
+                sx={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center' }} // Center align text and icon
+              >
+                <Icon sx={{ fontSize: '24px', mb: 1 }}>{item.icon}</Icon> {/* Decrease icon size and add margin */}
+                <ListItemText primary={item.text} primaryTypographyProps={{ fontSize: '12px' }} /> {/* Decrease text size */}
               </ListItem>
             ))}
           </List>
           <Divider />
         </Box>
       </Drawer>
-      <Box
-        component="main"
-        // sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, marginLeft: `${drawerWidth}px` }}
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-      >
-        <Toolbar />
-        {renderContent()}
+      <Box sx={{ display: 'flex', flexGrow: 1 }}>
+        {selectedComponent === 'chat' && <ContactList />} {/* Conditionally render ContactList */}
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        >
+          <Toolbar />
+          {renderContent()}
+        </Box>
       </Box>
     </Box>
   );
