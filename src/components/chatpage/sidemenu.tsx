@@ -66,17 +66,17 @@
 
 import React, { useState } from 'react';
 import { FaBell, FaUsers, FaComments } from "react-icons/fa";
-import { Drawer, List, ListItem, ListItemText, Box, AppBar, Toolbar, Typography, CssBaseline, Divider, Icon } from '@mui/material';
+import { Drawer, List, ListItem, ListItemText, Box, AppBar, Toolbar, Typography, CssBaseline, Divider, Icon, Avatar } from '@mui/material';
 import Chatmessage from './chatmessage.tsx';
-import ContactList from './ContactList.tsx'; // Import the ContactList component
+import ContactList from './ContactList.tsx';
 
 interface Item {
   id: number;
   name: string;
   details: string | React.ReactElement;
+  image?: string;
 }
 
-// Define content components
 const ActivityContent = ({ selectedItem, onSelect }: { selectedItem: Item | null, onSelect: (item: Item) => void }) => {
   const allMsg = [" "]; // Your messages data
   const user = { name: 'John Doe' }; // Your user data
@@ -109,12 +109,22 @@ const ActivityContent = ({ selectedItem, onSelect }: { selectedItem: Item | null
   );
 };
 
-const ChatContent = () => (
+const ChatContent = ({ selectedUser }: { selectedUser: Item | null }) => (
   <Box sx={{ flexGrow: 1 }}>
-    <Typography variant="h5">Chat page</Typography>
-    <Typography variant="body1">
-      This is the about page content. It contains information about the application or company.
-    </Typography>
+    {selectedUser ? (
+      <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#064D51', p: 3, mt: -8 }}>
+          <Avatar alt={selectedUser.name} src={selectedUser.image} sx={{ mr: 2 }} />
+          <Typography variant="h6" color="white">{selectedUser.name}</Typography>
+        </Box>
+        <Box sx={{ p: 2, mt: 20 }}>
+          {/* Your chat component or messages can go here */}
+          <Typography variant="body1">Send a message to start chat with {selectedUser.name}</Typography>
+        </Box>
+      </Box>
+    ) : (
+      <Typography variant="h5" sx={{ p: 2, mt: 20 }}>Select a user to start chatting</Typography>
+    )}
   </Box>
 );
 
@@ -153,18 +163,23 @@ const menuItems = [
   { text: 'Teams', component: 'teams', icon: <FaUsers /> },
 ];
 
-const drawerWidth = 80; // Decrease the size of the sidebar
+const drawerWidth = 80;
 
 const App: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedComponent, setSelectedComponent] = useState<string>('activity');
+  const [selectedUser, setSelectedUser] = useState<Item | null>(null);
 
   const handleSelectItem = (item: Item) => {
     setSelectedItem(item);
   };
 
+  const handleSelectUser = (user: Item) => {
+    setSelectedUser(user);
+  };
+
   const handleMenuItemClick = (component: string) => {
-    setSelectedItem(null); // Clear selected item when switching content
+    setSelectedItem(null);
     setSelectedComponent(component);
   };
 
@@ -173,7 +188,7 @@ const App: React.FC = () => {
       case 'activity':
         return <ActivityContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
       case 'chat':
-        return <ChatContent />;
+        return <ChatContent selectedUser={selectedUser} />;
       case 'teams':
         return <TeamsContent selectedItem={selectedItem} onSelect={handleSelectItem} />;
       default:
@@ -207,21 +222,21 @@ const App: React.FC = () => {
                 button
                 key={index}
                 onClick={() => handleMenuItemClick(item.component)}
-                sx={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center' }} // Center align text and icon
+                sx={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
               >
-                <Icon sx={{ fontSize: '24px', mb: 1 }}>{item.icon}</Icon> {/* Decrease icon size and add margin */}
-                <ListItemText primary={item.text} primaryTypographyProps={{ fontSize: '12px' }} /> {/* Decrease text size */}
+                <Icon sx={{ fontSize: '24px', mb: 1 }}>{item.icon}</Icon>
+                <ListItemText primary={item.text} primaryTypographyProps={{ fontSize: '12px' }} />
               </ListItem>
             ))}
           </List>
           <Divider />
         </Box>
       </Drawer>
-      <Box sx={{ display: 'flex', flexGrow: 1 }}>
-        {selectedComponent === 'chat' && <ContactList />} {/* Conditionally render ContactList */}
+      <Box sx={{ display: 'flex', flexGrow: 1}}>
+        {selectedComponent === 'chat' && <ContactList onSelectUser={handleSelectUser} />} {/* Pass onSelectUser to ContactList */}
         <Box
           component="main"
-          sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+          sx={{ flexGrow: 1, p: 0, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
         >
           <Toolbar />
           {renderContent()}
