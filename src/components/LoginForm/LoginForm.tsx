@@ -19,7 +19,7 @@ const GlobalStyle = createGlobalStyle`
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        background-image: url('background.jpg');
+        background-image: url('/background.jpg');  /* Reference to the image in the public folder */
         background-size: cover;
         background-position: center;
     }
