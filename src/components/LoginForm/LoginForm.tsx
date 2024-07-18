@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from '@mui/material/Button';
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import styled, { createGlobalStyle } from "styled-components";
+import { useNavigate } from 'react-router-dom';
 
 const GlobalStyle = createGlobalStyle`
     * {
@@ -24,6 +25,8 @@ const GlobalStyle = createGlobalStyle`
         background-position: center;
     }
 `;
+
+
 
 const Wrapper = styled.div`
     width: 420px;
@@ -114,6 +117,19 @@ const Wrapper = styled.div`
 
 const LoginForm: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState('uma');
+  const [password, setPassword] = useState('uma');
+    const navigate = useNavigate();
+
+    const handleLogin = () => {
+        // Implement your login logic here (e.g., API call)
+        if (username === 'uma' && password === 'uma') {
+          navigate('/chatpage');
+          
+        } else {
+          alert('Invalid credentials');
+        }
+      };
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -147,7 +163,7 @@ const LoginForm: React.FC = () => {
                         <a href="/">Forgot password?</a>
                     </div>
 
-                    <Button variant="contained">Login</Button>
+                    <Button variant="contained" onClick={handleLogin}>Login</Button>
 
                     <div className="register-link">
                         <p>Don't have an account? <a href="/">Signup here</a></p>
