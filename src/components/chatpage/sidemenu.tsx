@@ -24,7 +24,12 @@ const ActivityContent = ({ selectedItem, onSelect }: { selectedItem: Item | null
   return (
     <Box sx={{ display: 'flex' }}>
       <Box sx={{ flex: 1 }}>
+<<<<<<< HEAD
         <Typography variant="h5">Active Users</Typography>
+=======
+        <Typography variant="h5">Customers</Typography>
+        <h1>Abishck</h1>
+>>>>>>> 960c45b (initial commit)
         <List>
           {customers.map((customer) => (
             <ListItem button key={customer.id} onClick={() => onSelect(customer)}>
