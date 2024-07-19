@@ -1,11 +1,12 @@
 import * as React from "react";
-import Header from "../chatpage/header.tsx";
-import Sidemenu from "../chatpage/sidemenu.tsx";
+import MainHeader from "./Header/MainHeader.tsx";
+
+import Sidemenu from "./sidemenu/sidemenu.tsx";
 const Chatpage: React.FC = () => {
   return (
     <>
       <div>
-        <Header />
+        <MainHeader />
         <Sidemenu />
       </div>
     </>
