@@ -209,7 +209,7 @@ const App: React.FC = () => {
       {/* <AppBar position="fixed" sx={{ width: "100%", ml: { sm: `${drawerWidth}px` }, zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            My Application
+            My application
           </Typography>
         </Toolbar>
       </AppBar> */}
