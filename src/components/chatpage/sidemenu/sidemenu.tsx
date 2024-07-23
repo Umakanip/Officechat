@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 
 import ContactList from "../chatlist/ContactList.tsx";
+import ChatArea from "../ChatWindow/ChaArea.tsx";
 
 interface Item {
   id: number;
@@ -70,7 +71,6 @@ const ActivityContent = ({
 
 const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => (
   <Box sx={{ flexGrow: 1 }}>
-    {/* <div>{selectedUser | null}</div> */}
     {selectedUser ? (
       <Box>
         <Box
@@ -93,9 +93,10 @@ const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => (
         </Box>
         <Box sx={{ p: 2, mt: 20 }}>
           {/* Your chat component or messages can go here */}
-          <Typography variant="body1">
+          {/* <Typography variant="body1">
             Send a message to start chat with {selectedUser.Username}
-          </Typography>
+          </Typography> */}
+          <ChatArea data={selectedUser} />
         </Box>
       </Box>
     ) : (
@@ -160,7 +161,7 @@ const App: React.FC = () => {
   };
 
   const handleSelectUser = (user: any) => {
-    console.log(user);
+    // console.log(user);
     setSelectedUser(user);
   };
 

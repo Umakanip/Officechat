@@ -3,7 +3,8 @@ import Button from "@mui/material/Button";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
-
+import { useUser } from "../context/UserContext.tsx";
+import axios from "axios";
 const GlobalStyle = createGlobalStyle`
     * {
         margin: 0;
@@ -115,16 +116,40 @@ const Wrapper = styled.div`
 
 const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("uma");
-  const [password, setPassword] = useState("uma");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { setUser } = useUser();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  interface userData {
+    userDetails: any;
+  }
+  const handleLogin = async () => {
     // Implement your login logic here (e.g., API call)
-    if (username === "uma" && password === "uma") {
-      navigate("/chatpage");
-    } else {
-      alert("Invalid credentials");
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/login",
+        {
+          Email: email,
+          PasswordHash: password,
+        }
+      );
+
+      const userDetails = {
+        userdata: response.data.userDetails,
+        // Add any other user details you want to pass
+      };
+      // Set user details in context
+      setUser(userDetails);
+      // console.log("RESPONSE", response.data.userDetails);
+      navigate("/chatpage", { state: { userDetails } });
+    } catch (err: any) {
+      if (err.response) {
+        setError(err.response.data.message);
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
     }
   };
 
@@ -138,8 +163,14 @@ const LoginForm: React.FC = () => {
       <Wrapper>
         <form action="">
           <h1>Login</h1>
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <div className="input-box">
-            <input type="text" placeholder="Email" required />
+            <input
+              type="text"
+              placeholder="Email"
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
             <FaUser className="icon" />
           </div>
           <div className="input-box">
@@ -147,6 +178,7 @@ const LoginForm: React.FC = () => {
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               required
+              onChange={(e) => setPassword(e.target.value)}
             />
             {showPassword ? (
               <FaEye className="icon" onClick={togglePasswordVisibility} />
