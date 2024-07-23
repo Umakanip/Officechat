@@ -9,7 +9,7 @@ const ChatArea = (data: any) => {
   return (
     <>
       <Container>
-        <Header />
+        {/* <Header /> */}
         {/* <Chatbody /> */}
         <Footer userDetails={data.data} />
       </Container>
