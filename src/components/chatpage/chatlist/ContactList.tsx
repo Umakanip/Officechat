@@ -21,7 +21,7 @@ interface ContactListProps {
 }
 
 const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
-  console.log(onSelectUser);
+  // console.log(onSelectUser);
   const [Contact, setContact] = useState<any[]>([]);
 
   const [error, setError] = useState<string | null>(null);
