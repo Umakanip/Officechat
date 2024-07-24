@@ -40,9 +40,9 @@ const Footer = ({ userDetails }) => {
     const currentTime = new Date();
     const messageData = {
       author: user?.userdata?.UserName,
-      room: userDetails.UserID, // Ensure the room is included
+      // room: userDetails.UserID, // Ensure the room is included
       receiverID: userDetails.UserID,
-      ChatID: 4, // Assuming `data.room` is ChatID
+      // ChatID: 4, // Assuming `data.room` is ChatID
       SenderID: user?.userdata?.UserID, // Assuming `data.senderID` is the sender's ID
       Content: currentMessage, // Message content
       SentAt: currentTime, // Timestamp
