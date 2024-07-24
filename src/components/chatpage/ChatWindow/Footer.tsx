@@ -36,7 +36,7 @@ const Footer = ({ userDetails }) => {
   const { user } = useUser();
 
   const sendMessage = async () => {
-    console.log(user?.userdata?.UserID);
+    console.log("currentMessage", currentMessage);
     const currentTime = new Date();
     const messageData = {
       author: user?.userdata?.UserName,
@@ -87,6 +87,10 @@ const Footer = ({ userDetails }) => {
     };
 
     socket.on("receive_message", handleMessageReceive);
+
+    return () => {
+      socket.off("receive_message", handleMessageReceive);
+    };
   }, [userDetails.UserID]);
 
   return (

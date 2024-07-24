@@ -58,7 +58,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen','Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
         }}
       >
-        Chat List
+        Chat
       </Typography>
       <List sx={{ flexGrow: 1, overflow: "auto" }}>
         {" "}
@@ -68,7 +68,14 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
             <ListItemAvatar>
               <Avatar alt={item.Username} src={item.ProfilePicture} />
             </ListItemAvatar>
-            <ListItemText primary={item.Username} />
+            <ListItemText
+              primary={item.Username}
+              secondary={
+                <Typography variant="body2" color="textSecondary">
+                  Some Text to write
+                </Typography>
+              }
+            />
           </ListItem>
         ))}
       </List>

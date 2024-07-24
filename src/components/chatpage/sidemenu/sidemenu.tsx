@@ -14,7 +14,7 @@ import {
   Icon,
   Avatar,
 } from "@mui/material";
-
+import "./SideMenu.css";
 import ContactList from "../chatlist/ContactList.tsx";
 import ChatArea from "../ChatWindow/ChaArea.tsx";
 
