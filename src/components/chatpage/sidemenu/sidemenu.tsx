@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaBell, FaUsers, FaComments } from "react-icons/fa";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVideo } from '@fortawesome/free-solid-svg-icons';
 import {
   Drawer,
   List,
@@ -13,6 +16,7 @@ import {
   Divider,
   Icon,
   Avatar,
+  Button,
 } from "@mui/material";
 import "./SideMenu.css";
 import ContactList from "../chatlist/ContactList.tsx";
@@ -69,7 +73,17 @@ const ActivityContent = ({
   );
 };
 
-const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => (
+
+const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => {
+
+  const navigate = useNavigate();
+
+  const handleVideoClick = () => {
+    alert("Would you like to Continue the VideoCall?");
+    navigate("/video-call");
+  };
+
+  return (
   <Box sx={{ flexGrow: 1 }}>
     {selectedUser ? (
       <Box>
@@ -90,6 +104,13 @@ const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => (
           <Typography variant="h6" color="white">
             {selectedUser.Username}
           </Typography>
+          {/* <FontAwesomeIcon
+            icon={faVideo}
+            onClick={handleVideoClick}
+            size="2x"
+            style={{ marginLeft: "auto", cursor: "pointer", color: "#1976d2" }}
+          /> */}
+          <Button onClick={handleVideoClick} style={{ marginLeft: "auto", cursor: "pointer" }}>Connect</Button>
         </Box>
         <Box sx={{ p: 2, mt: 20 }}>
           {/* Your chat component or messages can go here */}
@@ -106,6 +127,7 @@ const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => (
     )}
   </Box>
 );
+};
 
 const TeamsContent = ({
   selectedItem,
