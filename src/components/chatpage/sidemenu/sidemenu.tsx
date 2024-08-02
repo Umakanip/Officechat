@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBell, FaUsers, FaComments } from "react-icons/fa";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVideo } from '@fortawesome/free-solid-svg-icons';
 import {
   Drawer,
   List,
@@ -17,7 +15,9 @@ import {
   Icon,
   Avatar,
   Button,
+  IconButton,
 } from "@mui/material";
+import VideocamIcon from '@mui/icons-material/Videocam';
 import "./SideMenu.css";
 import ContactList from "../chatlist/ContactList.tsx";
 import ChatArea from "../ChatWindow/ChaArea.tsx";
@@ -79,7 +79,6 @@ const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => {
   const navigate = useNavigate();
 
   const handleVideoClick = () => {
-    alert("Would you like to Continue the VideoCall?");
     navigate("/video-call");
   };
 
@@ -104,13 +103,12 @@ const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => {
           <Typography variant="h6" color="white">
             {selectedUser.Username}
           </Typography>
-          {/* <FontAwesomeIcon
-            icon={faVideo}
-            onClick={handleVideoClick}
-            size="2x"
-            style={{ marginLeft: "auto", cursor: "pointer", color: "#1976d2" }}
-          /> */}
-          <Button onClick={handleVideoClick} style={{ marginLeft: "auto", cursor: "pointer" }}>Connect</Button>
+          {/* <Button onClick={handleVideoClick} style={{ marginLeft: "auto", cursor: "pointer" }}>Connect</Button> */}
+          <IconButton
+            sx={{ marginLeft: "auto", color: "#1976d2" }} // Ensure the icon is visible on dark background
+            onClick={handleVideoClick}>
+          <VideocamIcon sx={{ fontSize: 35 }} />
+          </IconButton>
         </Box>
         <Box sx={{ p: 2, mt: 20 }}>
           {/* Your chat component or messages can go here */}

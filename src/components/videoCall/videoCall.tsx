@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack, IRemoteUser } from 'agora-rtc-sdk-ng';
 import './main.css';
 
 const APP_ID = "9fee5942271f49f3bb2897cf9a6b5e48";
-const TOKEN = "007eJxTYFhcxP1OQzSn9d8he2Px41W6DTtrlO3eObsZlt3WlJ7/9ZUCg2VaaqqppYmRkblhmollmnFSkpGFpXlymmWiWZJpqomFIOuqtIZARobkpTtYGBkgEMRnYfBNzMxjYAAA7T4eAg==";
+const TOKEN = "007eJxTYEjaXrNNpOfbW6uOnR+cRdQ//DucuDBc6vfaFmZGX5bdLbMVGCzTUlNNLU2MjMwN00ws04yTkowsLM2T0ywTzZJMU00sTuatSWsIZGSY7ObJzMgAgSA+C4NvYmYeAwMAlmQf+A==";
 const CHANNEL = "Main";
 
 const VideoChat: React.FC = () => {
+  const navigate = useNavigate();
   const [client] = useState<IAgoraRTCClient>(AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' }));
   const [localTracks, setLocalTracks] = useState<[IMicrophoneAudioTrack, ICameraVideoTrack] | []>([]);
   const [remoteUsers, setRemoteUsers] = useState<IRemoteUser[]>([]);
   const [isStreamActive, setStreamActive] = useState(false);
+
+  useEffect(() => {
+    // Join call on component mount
+    setStreamActive(true);
+  }, []);
 
   useEffect(() => {
     if (isStreamActive) {
@@ -41,10 +48,6 @@ const VideoChat: React.FC = () => {
     await client.publish(tracks);
   };
 
-  const handleJoinCall = () => {
-    setStreamActive(true);
-  };
-
   const handleLeaveCall = async () => {
     setStreamActive(false);
   
@@ -63,6 +66,9 @@ const VideoChat: React.FC = () => {
     } else {
       console.error('Element with ID "video-streams" not found');
     }
+
+    // Redirect to /chatpage
+    navigate('/chatpage');
   };  
 
   const handleUserJoined = async (user: IRemoteUser, mediaType: 'audio' | 'video') => {
@@ -131,12 +137,6 @@ const VideoChat: React.FC = () => {
 
   return (
     <div>
-      {!isStreamActive && (
-        <button id="join-btn" onClick={handleJoinCall}>
-          Join Call
-        </button>
-      )}
-
       {isStreamActive && (
         <div id="stream-wrapper">
           <div id="video-streams"></div>
