@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { MouseEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   IconButton,
@@ -11,6 +12,7 @@ import {
 } from "@mui/material";
 import { Message, Group, User } from "./messagetypes.ts";
 import GroupIcon from "@mui/icons-material/Group";
+import VideocamIcon from "@mui/icons-material/Videocam";
 import { useUser } from "../../context/UserContext.tsx";
 
 interface HeaderProps {
@@ -37,6 +39,12 @@ const Header: React.FC<HeaderProps> = ({
   });
   const handlePopoverOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const navigate = useNavigate();
+
+  const handleVideoClick = () => {
+    navigate("/video-call");
   };
 
   const handlePopoverClose = () => {
@@ -189,6 +197,11 @@ const Header: React.FC<HeaderProps> = ({
               sx={{ color: "black" }}
               onClick={handleDialogOpen} // Open dialog on click
             /> */}
+             <IconButton
+                sx={{ marginLeft: "auto", color: "#1976d2" }} // Ensure the icon is visible on dark background
+                onClick={handleVideoClick}>
+                <VideocamIcon sx={{ fontSize: 30 }} /> {/* Adjust the font size as needed */}
+              </IconButton>
               <IconButton
                 sx={{ color: "black" }} // Ensure the icon is visible on dark background
                 onClick={handlePopoverOpen}

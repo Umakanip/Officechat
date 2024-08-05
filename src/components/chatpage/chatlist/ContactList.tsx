@@ -143,21 +143,21 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
     setContact(updatedArray);
   }, [loggedInUsers]);
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      console.log(loggedInUsers);
-      const updatedArray = Contact.map((item) => ({
-        ...item,
-        isActive: loggedInUsers.includes(item.UserID) ? true : false,
-      }));
-      setContact(updatedArray);
-    };
+  // useEffect(() => {
+  //   const handleVisibilityChange = () => {
+  //     console.log(loggedInUsers);
+  //     const updatedArray = Contact.map((item) => ({
+  //       ...item,
+  //       isActive: loggedInUsers.includes(item.UserID) ? true : false,
+  //     }));
+  //     setContact(updatedArray);
+  //   };
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+  //   document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [loggedInUsers]);
+  //   return () =>
+  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
+  // }, [loggedInUsers]);
 
   console.log("Group", groups);
 

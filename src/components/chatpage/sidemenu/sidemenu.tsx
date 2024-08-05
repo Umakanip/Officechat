@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaBell, FaUsers, FaComments } from "react-icons/fa";
 import {
   Drawer,
@@ -13,7 +12,6 @@ import {
   Divider,
   Icon,
 } from "@mui/material";
-import VideocamIcon from "@mui/icons-material/Videocam";
 import "./SideMenu.css";
 import ContactList from "../chatlist/ContactList.tsx";
 import ChatArea from "../ChatWindow/ChaArea.tsx";
