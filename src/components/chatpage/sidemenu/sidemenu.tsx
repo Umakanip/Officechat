@@ -6,23 +6,24 @@ import {
   ListItem,
   ListItemText,
   Box,
-  AppBar,
   Toolbar,
   Typography,
   CssBaseline,
   Divider,
   Icon,
-  Avatar,
 } from "@mui/material";
 import "./SideMenu.css";
 import ContactList from "../chatlist/ContactList.tsx";
 import ChatArea from "../ChatWindow/ChaArea.tsx";
+import { useUser } from "../../context/UserContext.tsx";
 
 interface Item {
-  id: number;
-  name: string;
-  details: string | React.ReactElement;
-  image?: string;
+  details: string;
+  id: number | null | undefined;
+  ProfilePicture: string | undefined;
+  Username: string;
+  UserID: number | null;
+  GroupID: number | null;
 }
 
 const ActivityContent = ({
@@ -32,15 +33,31 @@ const ActivityContent = ({
   selectedItem: Item | null;
   onSelect: (item: Item) => void;
 }) => {
-  const allMsg = [" "]; // Your messages data
-  const user = { name: "John Doe" }; // Your user data
-  const handleDelete = (id: number) => {
-    /* Your delete logic */
-  };
   const customers: Item[] = [
-    { id: 1, name: "Customer 1", details: "Details about Customer 1" },
-    { id: 2, name: "Customer 2", details: "Details about Customer 2" },
-    { id: 3, name: "Customer 3", details: "Details about Customer 3" },
+    {
+      id: 1,
+      Username: "Customer 1",
+      details: "Details about Customer 1",
+      ProfilePicture: undefined,
+      UserID: null,
+      GroupID: null,
+    },
+    {
+      id: 2,
+      Username: "Customer 2",
+      details: "Details about Customer 2",
+      ProfilePicture: undefined,
+      UserID: null,
+      GroupID: null,
+    },
+    {
+      id: 3,
+      Username: "Customer 3",
+      details: "Details about Customer 3",
+      ProfilePicture: undefined,
+      UserID: null,
+      GroupID: null,
+    },
   ];
 
   return (
@@ -54,14 +71,14 @@ const ActivityContent = ({
               key={customer.id}
               onClick={() => onSelect(customer)}
             >
-              <ListItemText primary={customer.name} />
+              <ListItemText primary={customer.Username} />
             </ListItem>
           ))}
         </List>
       </Box>
       {selectedItem && (
         <Box sx={{ flex: 2, ml: 3 }}>
-          <Typography variant="h6">{selectedItem.name}</Typography>
+          <Typography variant="h6">{selectedItem.Username}</Typography>
           <Typography>{selectedItem.details}</Typography>
         </Box>
       )}
@@ -69,43 +86,17 @@ const ActivityContent = ({
   );
 };
 
-const ChatContent = ({ selectedUser }: { selectedUser: any | null }) => (
-  <Box sx={{ flexGrow: 1 }}>
-    {selectedUser ? (
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            bgcolor: "#064D51",
-            p: 3,
-            mt: -8,
-          }}
-        >
-          <Avatar
-            alt={selectedUser.Username}
-            src={selectedUser.image}
-            sx={{ mr: 2 }}
-          />
-          <Typography variant="h6" color="white">
-            {selectedUser.Username}
-          </Typography>
-        </Box>
-        <Box sx={{ p: 2, mt: 20 }}>
-          {/* Your chat component or messages can go here */}
-          {/* <Typography variant="body1">
-            Send a message to start chat with {selectedUser.Username}
-          </Typography> */}
-          <ChatArea data={selectedUser} />
-        </Box>
-      </Box>
-    ) : (
-      <Typography variant="h5" sx={{ p: 2, mt: 20 }}>
-        Select a user to start chatting
-      </Typography>
-    )}
-  </Box>
-);
+interface ChatContentProps {
+  selectedUser: Item | null;
+}
+
+const ChatContent: React.FC<ChatContentProps> = ({ selectedUser }) => {
+  return (
+    <div>
+      {selectedUser && <ChatArea userDetails={selectedUser}></ChatArea>}
+    </div>
+  );
+};
 
 const TeamsContent = ({
   selectedItem,
@@ -115,9 +106,30 @@ const TeamsContent = ({
   onSelect: (item: Item) => void;
 }) => {
   const contacts: Item[] = [
-    { id: 1, name: "Contact 1", details: "Details about Contact 1" },
-    { id: 2, name: "Contact 2", details: "Details about Contact 2" },
-    { id: 3, name: "Contact 3", details: "Details about Contact 3" },
+    {
+      id: 1,
+      Username: "Contact 1",
+      details: "Details about Contact 1",
+      ProfilePicture: undefined,
+      UserID: null,
+      GroupID: null,
+    },
+    {
+      id: 2,
+      Username: "Contact 2",
+      details: "Details about Contact 2",
+      ProfilePicture: undefined,
+      UserID: null,
+      GroupID: null,
+    },
+    {
+      id: 3,
+      Username: "Contact 3",
+      details: "Details about Contact 3",
+      ProfilePicture: undefined,
+      UserID: null,
+      GroupID: null,
+    },
   ];
 
   return (
@@ -127,14 +139,14 @@ const TeamsContent = ({
         <List>
           {contacts.map((contact) => (
             <ListItem button key={contact.id} onClick={() => onSelect(contact)}>
-              <ListItemText primary={contact.name} />
+              <ListItemText primary={contact.Username} />
             </ListItem>
           ))}
         </List>
       </Box>
       {selectedItem && (
         <Box sx={{ flex: 2, ml: 3 }}>
-          <Typography variant="h6">{selectedItem.name}</Typography>
+          <Typography variant="h6">{selectedItem.Username}</Typography>
           <Typography>{selectedItem.details}</Typography>
         </Box>
       )}
@@ -148,27 +160,56 @@ const menuItems = [
   { text: "Teams", component: "teams", icon: <FaUsers /> },
 ];
 
+interface GroupChat {
+  id: number;
+  name: string;
+}
+
+interface SideMenuProps {
+  groupChats: GroupChat[];
+  onSelectChat: (chat: GroupChat) => void;
+}
 const drawerWidth = 80;
 
-const App: React.FC = () => {
+const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedComponent, setSelectedComponent] =
     useState<string>("activity");
   const [selectedUser, setSelectedUser] = useState<Item | null>(null);
+  const { setActiveGroup, setActiveUser } = useUser();
 
   const handleSelectItem = (item: Item) => {
     setSelectedItem(item);
   };
 
   const handleSelectUser = (user: any) => {
-    // console.log(user);
-    setSelectedUser(user);
+    if (user.GroupID) {
+      // If the item has GroupID, it's a group
+      setSelectedUser(user);
+      setActiveGroup(user.GroupID); // Set the active group
+      setActiveUser(null); // Clear active user
+    } else if (user.UserID) {
+      // If the item has UserID, it's a user
+      setSelectedUser(user);
+      setActiveUser(user.UserID); // Set the active user
+      setActiveGroup(null); // Clear active group
+    }
   };
 
   const handleMenuItemClick = (component: string) => {
     setSelectedItem(null);
     setSelectedComponent(component);
   };
+
+  // // Handle group creation
+  // const handleGroupCreation = (groupEmail: string) => {
+  //   const newGroup = groupChats.find((group) => group.name === groupEmail);
+  //   if (newGroup) {
+  //     setSelectedItem(null); // Clear any selected item
+  //     setSelectedComponent("chat"); // Switch to chat component
+  //     setSelectedUser({ ...newGroup, GroupID: newGroup.id } as Item); // Update state with new group details
+  //   }
+  // };
 
   const renderContent = () => {
     switch (selectedComponent) {
@@ -180,7 +221,13 @@ const App: React.FC = () => {
           />
         );
       case "chat":
-        return <ChatContent selectedUser={selectedUser} />;
+        return selectedUser ? (
+          <ChatContent selectedUser={selectedUser} />
+        ) : (
+          <Typography variant="h5" sx={{ p: 2, mt: 20 }}>
+            Select a user to start chatting
+          </Typography>
+        );
       case "teams":
         return (
           <TeamsContent
@@ -201,13 +248,6 @@ const App: React.FC = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      {/* <AppBar position="fixed" sx={{ width: "100%", ml: { sm: `${drawerWidth}px` }, zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            My application
-          </Typography>
-        </Toolbar>
-      </AppBar> */}
       <Drawer
         variant="permanent"
         sx={{
@@ -231,6 +271,18 @@ const App: React.FC = () => {
                   flexDirection: "column",
                   alignItems: "center",
                   textAlign: "center",
+                  backgroundColor:
+                    selectedComponent === item.component
+                      ? "#e0e0e0"
+                      : "transparent", // Highlight active item
+                  borderLeft:
+                    selectedComponent === item.component
+                      ? "2px solid rgb(98, 109, 205)"
+                      : "none", // Border for active item
+                  color:
+                    selectedComponent === item.component
+                      ? "rgb(98, 109, 205)"
+                      : "none", // Border for active item
                 }}
               >
                 <Icon sx={{ fontSize: "24px", mb: 1 }}>{item.icon}</Icon>
@@ -247,8 +299,7 @@ const App: React.FC = () => {
       <Box sx={{ display: "flex", flexGrow: 1 }}>
         {selectedComponent === "chat" && (
           <ContactList onSelectUser={handleSelectUser} />
-        )}{" "}
-        {/* Pass onSelectUser to ContactList */}
+        )}
         <Box
           component="main"
           sx={{
@@ -265,4 +316,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default SideMenu;

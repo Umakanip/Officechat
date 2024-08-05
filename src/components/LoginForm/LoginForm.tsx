@@ -140,6 +140,7 @@ const LoginForm: React.FC = () => {
         userdata: response.data.userDetails,
         // Add any other user details you want to pass
       };
+      console.log("for storing", response.data.userDetails.UserID);
       // Set user details in context
       setUser(userDetails);
       // console.log("RESPONSE", response.data.userDetails);

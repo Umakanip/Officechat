@@ -2,6 +2,7 @@ import * as React from "react";
 import MainHeader from "./Header/MainHeader.tsx";
 
 import Sidemenu from "./sidemenu/sidemenu.tsx";
+import { Container, Box } from "@mui/material";
 // import { useLocation } from "react-router-dom";
 const Chatpage: React.FC = () => {
   // const location = useLocation();
@@ -9,10 +10,10 @@ const Chatpage: React.FC = () => {
 
   return (
     <>
-      <div style={{ height: "100vh" }}>
+      <Box sx={{ height: "100vh" }}>
         <MainHeader />
         <Sidemenu />
-      </div>
+      </Box>
     </>
   );
 };

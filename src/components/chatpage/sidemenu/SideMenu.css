@@ -1,4 +1,32 @@
+.MuiDrawer-paper {
+  height: calc(100vh - 64px); /* Subtract the height of the MainHeader */
+  overflow: auto;
+}
 .disabled {
   pointer-events: none; /* Prevents clicking and other interactions */
   opacity: 0.5; /* Optional: to give a visual cue that the component is disabled */
 }
+.css-ui4lct {
+  background-color: white !important;
+  /* color: black !important; */
+  height: 64px !important;
+  border-bottom: 2px solid #80808021 !important;
+}
+.css-12i7wg6-MuiPaper-root-MuiDrawer-paper {
+  background-color: #6b696933 !important;
+}
+.css-uconuz {
+  background-color: transparent !important;
+  color: #5d5959 !important;
+}
+/* .css-h4y409-MuiList-root div:hover {
+  color: rgb(98, 109, 205) !important; */
+/* border: none !important; */
+/* border-left: 2px solid rgb(98, 109, 205) !important;
+}
+.css-1ypv6od-MuiButtonBase-root-MuiListItem-root:hover {
+  background-color: transparent !important;
+}
+.css-h4y409-MuiList-root span:hover {
+  border-left: 0 !important;
+} */

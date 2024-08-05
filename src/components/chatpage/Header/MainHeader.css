@@ -1,6 +1,7 @@
-.css-uconuz {
-  background-color: #aaaaaa57 !important;
+.MuiAppBar-root {
+  height: 64px; /* Adjust height if necessary */
 }
+
 .css-1ypv6od-MuiButtonBase-root-MuiListItem-root:hover {
   color: rgb(93 100 173) !important;
 }
@@ -21,7 +22,7 @@
 }
 .css-1wlgf0q {
   height: 65px !important;
-  background-color: white !important;
+  /* background-color: white !important; */
   border-bottom: 2px solid #80808021 !important;
 }
 .css-1ct5mxn {

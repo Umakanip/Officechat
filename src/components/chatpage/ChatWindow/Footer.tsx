@@ -1,53 +1,40 @@
 import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from "react";
-import ScrollToBottom from "react-scroll-to-bottom";
+import { Box, TextField, Button, Container } from "@mui/material";
 import axios from "axios";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Container,
-} from "@mui/material";
 import { useUser } from "../../context/UserContext.tsx";
 import io, { Socket } from "socket.io-client";
+import { Message } from "./messagetypes";
 
+interface FooterProps {
+  userDetails: any;
+  setMessageList: React.Dispatch<React.SetStateAction<Message[]>>;
+}
 //const SOCKET_URL = "http://localhost:3000"; // Update this URL to your server address
 const socket: Socket = io("http://localhost:5000");
 
-// Define the types
-interface Message {
-  author: String;
-  room: String;
-  receiverID: Number;
-  ChatID: Number; // Assuming `data.room` is ChatID
-  SenderID: Number; // Assuming `data.senderID` is the sender's ID
-  Content: String; // Message content
-  SentAt: String; // Timestamp
-  IsDeleted: Boolean; // Default value
-  IsPinned: Boolean; // Default value
-}
-
-const Footer = ({ userDetails }) => {
+const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
   const [currentMessage, setcurrentMessage] = useState("");
-  const [messageList, setMessageList] = useState<Message[]>([]);
+  // const [messageList, setMessageList] = useState<Message[]>([]);
   const { user } = useUser();
 
   const sendMessage = async () => {
     console.log("currentMessage", currentMessage);
+    console.log("user", user);
+    console.log("userdetails", userDetails);
+    // console.log("chatType", chatType);
     const currentTime = new Date();
     const messageData = {
       author: user?.userdata?.UserName,
       // room: userDetails.UserID, // Ensure the room is included
-      receiverID: userDetails.UserID,
+      receiverID: userDetails.UserID ? userDetails.UserID : undefined,
+      groupID: userDetails.GroupID ? userDetails.GroupID : undefined,
       // ChatID: 4, // Assuming `data.room` is ChatID
       SenderID: user?.userdata?.UserID, // Assuming `data.senderID` is the sender's ID
       Content: currentMessage, // Message content
       SentAt: currentTime, // Timestamp
       IsDeleted: false, // Default value
       IsPinned: false, // Default value
+      isGroupChat: userDetails.GroupID ? true : false, // Change this based on the chat type
     };
     console.log("Sending message:", messageData);
     socket.emit("send_message", messageData);
@@ -55,12 +42,19 @@ const Footer = ({ userDetails }) => {
   };
 
   useEffect(() => {
-    console.log("contextapi", userDetails.UserID);
+    console.log("contextapi", userDetails);
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/messages?SenderID=${userDetails.UserID}`
-        );
+        let response;
+        if (userDetails.GroupID) {
+          response = await axios.get(
+            `http://localhost:3000/api/groupmessages?groupid=${userDetails.GroupID}`
+          );
+        } else {
+          response = await axios.get(
+            `http://localhost:3000/api/messages/${userDetails.UserID}`
+          );
+        }
         // const messages = await response;
         console.log("response", response.data);
         setMessageList(response.data);
@@ -91,54 +85,10 @@ const Footer = ({ userDetails }) => {
     return () => {
       socket.off("receive_message", handleMessageReceive);
     };
-  }, [userDetails.UserID]);
+  }, [userDetails.UserID, setMessageList]);
 
   return (
-    <Container
-      maxWidth="sm"
-      style={{ height: "100vh", display: "flex", flexDirection: "column" }}
-    >
-      <Box sx={{ flex: 1, overflow: "auto" }}>
-        {/* <ScrollToBottom className="message-container"> */}
-
-        <List>
-          {messageList.map((messageContent, index) => {
-            console.log("Current message content:", messageContent);
-            return (
-              <ListItem
-                key={index}
-                alignItems="flex-start"
-                style={{
-                  backgroundColor:
-                    userDetails.Username === messageContent.author
-                      ? "#e1ffc7"
-                      : "#f1f0f0",
-                  margin: "10px 0",
-                }}
-              >
-                <ListItemText
-                  primary={messageContent.Content}
-                  secondary={
-                    <>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        color="text.primary"
-                      >
-                        {userDetails.Username === messageContent.author
-                          ? "You"
-                          : "OtherSS"}
-                      </Typography>
-                      {" — " + messageContent.SentAt}
-                    </>
-                  }
-                />
-              </ListItem>
-            );
-          })}
-        </List>
-        {/* </ScrollToBottom> */}
-      </Box>
+    <Container>
       <Box
         sx={{
           display: "flex",
