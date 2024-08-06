@@ -7,12 +7,14 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import VoiceCall from "./components/VoiceCall/Calls.tsx";
 // import UserActivityTracker from "./components/UserActivityTracker.tsx"; // Import the component
 // ort VisibilityHandler from "./components/VisibilityHandler.tsx"; // Import the component
+// import VisibilityHandler from "./components/VisibilityHandler.tsx"; // Import the component
 import VideoCall from "./components/videoCall/videoCall.tsx";
 function App() {
   return (
     <UserProvider>
       <Router>
         {/* <UserActivityTracker /> {/* Include the component */}
+        {/* <UserActivityTracker /> Include the component */}
         {/* <VisibilityHandler /> Include the component */}
         <Routes>
           <Route path="/login" element={<Login />} />

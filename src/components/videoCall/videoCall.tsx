@@ -4,7 +4,7 @@ import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack, IR
 import './main.css';
 
 const APP_ID = "9fee5942271f49f3bb2897cf9a6b5e48";
-const TOKEN = "007eJxTYEjaXrNNpOfbW6uOnR+cRdQ//DucuDBc6vfaFmZGX5bdLbMVGCzTUlNNLU2MjMwN00ws04yTkowsLM2T0ywTzZJMU00sTuatSWsIZGSY7ObJzMgAgSA+C4NvYmYeAwMAlmQf+A==";
+const TOKEN = "007eJxTYJjPaWO8ylPnj3utVqXFukU18x/pOVfHrovZk1ZYp7bOK1yBwTItNdXU0sTIyNwwzcQyzTgpycjC0jw5zTLRLMk01cSi8u6GtIZARoa3RaUMjFAI4rMw+CZm5jEwAADY2h6L";
 const CHANNEL = "Main";
 
 const VideoChat: React.FC = () => {

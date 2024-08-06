@@ -24,7 +24,7 @@ interface UserContextProps {
   setActiveUser: (UserID: number | null) => void;
   selectedUserId: number | null;
   setSelectedUserId: (userId: number | null) => void;
-  // logout: () => void;
+  logout: () => void;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -37,7 +37,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [activeGroup, setActiveGroup] = useState<number | null>(null);
   const [activeUser, setActiveUser] = useState<number | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-
+  const logout = () => {
+    setUser(null);
+    // Optionally, perform additional cleanup (e.g., clear tokens)
+    // e.g., localStorage.removeItem('userToken');
+  };
   return (
     <UserContext.Provider
       value={{
@@ -51,6 +55,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         setActiveUser,
         selectedUserId,
         setSelectedUserId,
+        logout,
       }}
     >
       {children}

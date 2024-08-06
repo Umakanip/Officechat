@@ -90,7 +90,7 @@ function Header() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
   const handleLogout = () => {
-    console.log("Logout");
+    console.log("Logout", user?.userdata?.UserID);
 
     axios
       .post("http://localhost:3000/api/auth/logout", {
