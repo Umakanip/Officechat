@@ -159,7 +159,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
   //     document.removeEventListener("visibilitychange", handleVisibilityChange);
   // }, [loggedInUsers]);
 
-  console.log("Group", groups);
+  // console.log("Group", groups);
 
   const handleContactClick = (userid: number) => {
     console.log(userid);

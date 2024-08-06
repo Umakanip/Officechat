@@ -1,6 +1,6 @@
 import React, {
-  useState,
   useEffect,
+  useState,
   ChangeEvent,
   KeyboardEvent,
   MouseEvent,
@@ -13,8 +13,10 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Tooltip,
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { useUser } from "../../context/UserContext.tsx";
 import io, { Socket } from "socket.io-client";
@@ -24,13 +26,15 @@ interface FooterProps {
   userDetails: any;
   setMessageList: React.Dispatch<React.SetStateAction<Message[]>>;
 }
-//const SOCKET_URL = "http://localhost:3000"; // Update this URL to your server address
+
 const socket: Socket = io("http://localhost:5000");
 
 const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
   const [currentMessage, setcurrentMessage] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+
   const { user } = useUser();
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -41,97 +45,99 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
     setAnchorEl(null);
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+      setSelectedFile(file);
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setFilePreview(null);
+      }
     }
   };
-  const uploadFileContent = async () => {
-    if (selectedFile) {
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = async () => {
-        const fileContent = reader.result as string;
-        try {
-          await axios.post("http://localhost:3000/upload-content", {
-            content: fileContent,
-            filename: selectedFile.name,
-          });
-          alert("File content uploaded successfully");
-          setSelectedFile(null); // Clear selected file
-        } catch (error) {
-          console.error("Error uploading file content:", error);
-          alert("Error uploading file content");
-        }
+      reader.onloadend = () => {
+        resolve(reader.result as string);
       };
-      reader.readAsText(selectedFile); // Read file as text
-    }
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const sendMessage = async () => {
-    console.log("currentMessage", currentMessage);
-    console.log("user", user);
-    console.log("userdetails", userDetails);
-    // console.log("chatType", chatType);
     const currentTime = new Date();
     const messageData = {
       author: user?.userdata?.UserName,
-      // room: userDetails.UserID, // Ensure the room is included
       receiverID: userDetails.UserID ? userDetails.UserID : undefined,
       groupID: userDetails.GroupID ? userDetails.GroupID : undefined,
-      // ChatID: 4, // Assuming `data.room` is ChatID
-      SenderID: user?.userdata?.UserID, // Assuming `data.senderID` is the sender's ID
-      Content: currentMessage, // Message content
-      SentAt: currentTime, // Timestamp
-      IsDeleted: false, // Default value
-      IsPinned: false, // Default value
-      isGroupChat: userDetails.GroupID ? true : false, // Change this based on the chat type
+      SenderID: user?.userdata?.UserID,
+      Content: currentMessage,
+      SentAt: currentTime,
+      IsDeleted: false,
+      IsPinned: false,
+      isGroupChat: userDetails.GroupID ? true : false,
     };
-    console.log("Sending message:", messageData);
-    socket.emit("send_message", messageData);
-    setcurrentMessage("");
+
+    try {
+      if (selectedFile) {
+        const base64File = await fileToBase64(selectedFile);
+        const fileBlob = base64File.split(",")[1];
+
+        const formData = {
+          fileBlob,
+          filename: selectedFile.name,
+          filetype: selectedFile.type,
+          filesize: selectedFile.size,
+          MessageID: "5", // Ensure this is dynamic or handled correctly
+        };
+
+        // Upload the file to the server
+        const response = await axios.post(
+          "http://localhost:3000/api/uploadFile",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        // Set the file URL in the message content
+        messageData.Content = response.data.fileUrl; // Assume server returns file URL
+        setSelectedFile(null);
+        setFilePreview(null);
+      }
+
+      if (currentMessage || selectedFile) {
+        socket.emit("send_message", messageData);
+        setcurrentMessage("");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   useEffect(() => {
-    console.log("contextapi", userDetails);
-    const fetchMessages = async () => {
-      try {
-        let response;
-        if (userDetails.GroupID) {
-          response = await axios.get(
-            `http://localhost:3000/api/groupmessages?groupid=${userDetails.GroupID}`
-          );
-        } else {
-          response = await axios.get(
-            `http://localhost:3000/api/messages/${userDetails.UserID}`
-          );
-        }
-        // const messages = await response;
-        console.log("response", response.data);
-        setMessageList(response.data);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    };
-
-    fetchMessages();
-
     socket.on("connect", () => {
       console.log("Connected to server:", socket.id);
     });
-
     socket.on("disconnect", () => {
       console.log("Disconnected from server");
     });
-    // socket.emit("join_room", user?.userdata?.UserID);
 
-    // socket.emit("join_room", userDetails.UserID);
     const handleMessageReceive = (data) => {
       console.log("Message received on client:", data);
       setMessageList((list) => [...list, data]);
     };
-
     socket.on("receive_message", handleMessageReceive);
-
     return () => {
       socket.off("receive_message", handleMessageReceive);
     };
@@ -146,22 +152,65 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
           p: 2,
           borderTop: 1,
           borderColor: "divider",
+          position: "relative",
         }}
       >
-        <TextField
-          fullWidth
-          variant="outlined"
-          value={currentMessage}
-          placeholder="Hey..."
-          onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            setcurrentMessage(event.target.value);
-          }}
-          onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === "Enter") {
-              sendMessage();
-            }
-          }}
-        />
+        <Box sx={{ position: "relative", flexGrow: 1 }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={currentMessage}
+            placeholder="Hey..."
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setcurrentMessage(event.target.value);
+            }}
+            onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
+              if (event.key === "Enter") {
+                sendMessage();
+              }
+            }}
+            InputProps={{
+              endAdornment: selectedFile ? (
+                <Tooltip title="Remove file">
+                  <IconButton
+                    edge="end"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setFilePreview(null);
+                    }}
+                    sx={{ p: 0.5 }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : null,
+            }}
+          />
+          {filePreview && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "10px",
+                transform: "translateY(-50%)",
+                display: "flex",
+                alignItems: "center",
+                pointerEvents: "none", // Allows clicks to pass through the preview
+              }}
+            >
+              <img
+                src={filePreview}
+                alt="File Preview"
+                style={{
+                  maxWidth: "100px",
+                  maxHeight: "50px",
+                  borderRadius: "4px",
+                  marginRight: "10px",
+                }}
+              />
+            </Box>
+          )}
+        </Box>
         <Button
           onClick={sendMessage}
           variant="contained"
@@ -187,17 +236,12 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
             />
             <label htmlFor="upload-file">
               <Button component="span" variant="outlined" color="primary">
-                Upload from this device
+                Select File
               </Button>
             </label>
           </MenuItem>
           <MenuItem>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={uploadFileContent}
-              disabled={!selectedFile}
-            >
+            <Button variant="outlined" color="primary">
               Attach Cloud Files
             </Button>
           </MenuItem>
