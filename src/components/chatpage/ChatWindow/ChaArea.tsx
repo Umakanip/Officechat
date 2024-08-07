@@ -35,6 +35,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           // Handle case where neither group nor single chat is selected
           return;
         }
+        console.log("Fiel", response.data);
         setMessageList(response.data);
       } catch (error) {
         console.error("Error fetching messages:", error);

@@ -75,6 +75,23 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
 
   const sendMessage = async () => {
     const currentTime = new Date();
+    let formData = {};
+
+    if (selectedFile) {
+      const base64File = await fileToBase64(selectedFile);
+      const fileBlob = base64File.split(",")[1];
+
+      formData = {
+        fileBlob,
+        filename: selectedFile.name,
+        filetype: selectedFile.type,
+        filesize: selectedFile.size,
+        // MessageID: "5", // Ensure this is dynamic or handled correctly
+      };
+      setSelectedFile(null);
+      setFilePreview(null);
+    }
+
     const messageData = {
       author: user?.userdata?.UserName,
       receiverID: userDetails.UserID ? userDetails.UserID : undefined,
@@ -85,43 +102,12 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
       IsDeleted: false,
       IsPinned: false,
       isGroupChat: userDetails.GroupID ? true : false,
+      file: formData,
     };
-
-    try {
-      if (selectedFile) {
-        const base64File = await fileToBase64(selectedFile);
-        const fileBlob = base64File.split(",")[1];
-
-        const formData = {
-          fileBlob,
-          filename: selectedFile.name,
-          filetype: selectedFile.type,
-          filesize: selectedFile.size,
-          MessageID: "5", // Ensure this is dynamic or handled correctly
-        };
-
-        // Upload the file to the server
-        const response = await axios.post(
-          "http://localhost:3000/api/uploadFile",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        // Set the file URL in the message content
-        messageData.Content = response.data.fileUrl; // Assume server returns file URL
-        setSelectedFile(null);
-        setFilePreview(null);
-      }
-
-      if (currentMessage || selectedFile) {
-        socket.emit("send_message", messageData);
-        setcurrentMessage("");
-      }
-    } catch (error) {
-      console.error("Error sending message:", error);
+    if (currentMessage || selectedFile) {
+      socket.emit("send_message", messageData);
+      console.log("messageData", messageData);
+      setcurrentMessage("");
     }
   };
 
