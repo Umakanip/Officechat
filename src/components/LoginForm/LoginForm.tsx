@@ -1,176 +1,156 @@
 import React, { useState } from "react";
 import Button from "@mui/material/Button";
-import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext.tsx";
 import axios from "axios";
 
 const GlobalStyle = createGlobalStyle`
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(to bottom right, #4a90e2, #007aff, #5ac8fa);
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 `;
 
 const Wrapper = styled.div`
-  width: 50vw;
-  height: 60vh;
-  display: grid;
-  grid-template-columns: 100%;
-  grid-template-areas: "login";
-  box-shadow: 0 0 17px 10px rgb(0 0 0 / 30%);
-  border-radius: 10px;
-  background: white;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background: #fff;
+  padding: 0;
+  box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 
-  @media (min-width: 768px) {
-    grid-template-columns: 50% 50%;
-    grid-template-areas: "design login";
-  }
-
-  .design {
-  grid-area: design;
-  display: none;
-  position: relative;
-
-  @media (min-width: 768px) {
-    display: block;
-  }
-
-  .rotate-45 {
-    transform: rotate(-45deg);
-  }
-
-  .pill-1 {
-    bottom: 0;
-    left: -40px;
-    position: absolute;
-    width: 80px;
-    height: 200px;
-    background: linear-gradient(#6dbbff, #538dfa, #377c89);
-    border-radius: 40px;
-  }
-
-  .pill-2 {
-    top: -100px;
-    left: -80px;
-    position: absolute;
-    height: 450px;
-    width: 220px;
-    background: linear-gradient(#6dbbff, #538dfa, #377c89);
-    border-radius: 200px;
-    border: 30px solid #c5e2e2;
-  }
-
-  .pill-3 {
-    top: -100px;
-    left: 160px;
-    position: absolute;
-    height: 200px;
-    width: 100px;
-    background: linear-gradient(#6dbbff, #538dfa, #377c89);
-    border-radius: 70px;
-  }
-
-  .pill-4 {
-    bottom: -180px;
-    left: 220px;
-    position: absolute;
-    height: 300px;
-    width: 120px;
-    background: linear-gradient(#6dbbff, #538dfa);
-    border-radius: 70px;
-  }
-}
-
-  .login {
-    grid-area: login;
+  .side-image {
+    background-image: url("/login_image.png");
+    background-position: center;
+    margin-bottom: 100px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    border-radius: 10px 0 0 10px;
+    position: relative;
+    width: 50%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    background: white;
-
-    h2.title {
-      margin: 15px 0;
-      padding-bottom: 10px;
+    align-items: center;
+    .text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      p {
+        color: #fff;
+        font-size: 20px;
+      }
+      i {
+        font-weight: 400;
+        font-size: 15px;
+      }
     }
+  }
 
-    .text-input {
-      background: #e6e6e6;
-      height: 40px;
-      display: flex;
-      width: 60%;
-      align-items: center;
-      border-radius: 10px;
-      padding: 0 15px;
-      margin: 5px 0;
-
-      input {
-        background: none;
+  .right {
+    display: flex;
+    margin-left: 150px;
+    align-items: center;
+    width: 50%;
+    position: relative;
+    .input-box {
+      width: 330px;
+      box-sizing: border-box;
+      h1 {
+        font-weight: 700;
+        font-size: 50px;
+        text-align: center;
+        margin-bottom: 45px;
+        color: #55565B; 
+      }
+      .input-field {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        padding: 0 10px;
+        input {
+          height: 45px;
+          width: 100%;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+          outline: none;
+          margin-bottom: 20px;
+          color: #40414a;
+          &:focus,
+          &:valid {
+            border-bottom: 1px solid #743ae1;
+          }
+          &:focus ~ label,
+          &:valid ~ label {
+            top: -10px;
+            font-size: 13px;
+            color: #5d5076;
+          }
+        }
+        label {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          pointer-events: none;
+          transition: .5s;
+          color: #75767B;
+        }
+        .icon {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: pointer;
+        }
+      }
+      .submit {
+        margin-top: 10px;
+        margin-left: 90px;
         border: none;
         outline: none;
+        height: 45px;
+        width: 150px;
+        background: #f1b04c;
+        border-radius: 5px;
+        transition: .4s;
+        &:hover {
+        background: #f97613;
+          color: #fff;
+        }
+      }
+      .signUp {
+        text-align: center;
+        font-size: medium;
+        margin-top: 25px;
+        span a {
+          font-weight: 450;
+          color: #000;
+          transition: .5s;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    flex-direction: column;
+    .side-image {
+      width: 100%;
+      height: 50%;
+      border-radius: 10px 10px 0 0;
+    }
+    .right {
+      width: 100%;
+      .input-box {
         width: 100%;
-        height: 100%;
-        margin-left: 10px;
-      }
-
-      i {
-        color: #686868;
-      }
-
-      ::placeholder {
-        color: #9a9a9a;
-      }
-    }
-
-    .login-btn {
-      width: 48%;
-      padding: 10px;
-      color: white;
-      background: linear-gradient(to right, #4a90e2, #007aff, #5ac8fa);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    a {
-      font-size: 12px;
-      color: #9a9a9a;
-      cursor: pointer;
-      user-select: none;
-      text-decoration: none;
-    }
-
-    a.forgot {
-      margin-top: 15px;
-    }
-
-    .create {
-      margin-top: 30px;
-      color: #9a9a9a;
-      font-size: 12px;
-
-      a {
-        text-decoration: none;
-        color: #9a9a9a;
-      }
-
-      i {
-        color: #9a9a9a;
-        margin-left: 10px;
+        padding: 0 20px;
+        h1 {
+          margin-top: 20px;
+        }
       }
     }
   }
@@ -217,44 +197,46 @@ const LoginForm: React.FC = () => {
     <>
       <GlobalStyle />
       <Wrapper>
-        <div className="design">
-          <div className="pill-1 rotate-45"></div>
-          <div className="pill-2 rotate-45"></div>
-          <div className="pill-3 rotate-45"></div>
-          <div className="pill-4 rotate-45"></div>
+        <div className="side-image">
+          <img src="clubits.png" alt="logo" style={{ position: "absolute", top: "30px", left: "30px", width: "150px" }} />
         </div>
-        <div className="login">
-          <h2 className="title">Clubits Login</h2>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          <div className="text-input">
-            <FaUser />
-            <input
-              type="text"
-              placeholder="Email"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="text-input">
-            {showPassword ? (
-              <FaEyeSlash onClick={togglePasswordVisibility} />
-            ) : (
-              <FaEye onClick={togglePasswordVisibility} />
-            )}
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <Button variant="contained" onClick={handleLogin} className="login-btn">
-            LOGIN
-          </Button>
-          <a href="/" className="forgot">Forgot Username/Password?</a>
-          <div className="create">
-            Don't have an account? <a href="/">Signup here</a>&nbsp;
-            <FaUser />
+        <div className="right">
+          <div className="input-box">
+            <h1>Login</h1>
+            <div className="input-field">
+              <input
+                type="text"
+                className="input"
+                id="email"
+                required
+                autoComplete="off"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <label htmlFor="email">Email</label>
+            </div>
+            <div className="input-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="input"
+                id="pass"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <label htmlFor="pass">Password</label>
+              {showPassword ? (
+                <FaEyeSlash onClick={togglePasswordVisibility} className="icon" />
+              ) : (
+                <FaEye onClick={togglePasswordVisibility} className="icon" />
+              )}
+            </div>
+            <a href="/" style={{ color: '#006FFC', marginLeft: '200px', cursor: 'no-drop' }}>Forgot Password?</a><br /><br />
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <Button variant="contained" onClick={handleLogin} className="submit">
+              LOGIN
+            </Button>
+            <div className="signUp">
+              <span style={{ color: '#75767B' }}>Don't have an account? <a href="/" style={{ color: '#006FFC', cursor: 'no-drop' }}>Signup here</a></span>
+            </div>
           </div>
         </div>
       </Wrapper>
