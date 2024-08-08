@@ -84,14 +84,13 @@ const Wrapper = styled.div`
           }
           &:focus ~ label,
           &:valid ~ label {
-            top: -10px;
             font-size: 13px;
             color: #5d5076;
           }
         }
         label {
           position: absolute;
-          top: 10px;
+          top: -20px;
           left: 10px;
           pointer-events: none;
           transition: .5s;
@@ -100,7 +99,7 @@ const Wrapper = styled.div`
         .icon {
           position: absolute;
           right: 10px;
-          top: 50%;
+          top: 35%;
           transform: translateY(-50%);
           cursor: pointer;
         }
@@ -211,7 +210,7 @@ const LoginForm: React.FC = () => {
                 required
                 autoComplete="off"
                 onChange={(e) => setEmail(e.target.value)}
-              />
+              /><br />
               <label htmlFor="email">Email</label>
             </div>
             <div className="input-field">
@@ -229,13 +228,13 @@ const LoginForm: React.FC = () => {
                 <FaEye onClick={togglePasswordVisibility} className="icon" />
               )}
             </div>
-            <a href="/" style={{ color: '#006FFC', marginLeft: '200px', cursor: 'no-drop' }}>Forgot Password?</a><br /><br />
+            <a href="#" style={{ color: '#006FFC', marginLeft: '200px', cursor: 'no-drop' }}>Forgot Password?</a><br /><br />
             {error && <p style={{ color: "red" }}>{error}</p>}
             <Button variant="contained" onClick={handleLogin} className="submit">
               LOGIN
             </Button>
             <div className="signUp">
-              <span style={{ color: '#75767B' }}>Don't have an account? <a href="/" style={{ color: '#006FFC', cursor: 'no-drop' }}>Signup here</a></span>
+              <span style={{ color: '#75767B' }}>Don't have an account? <a href="#" style={{ color: '#006FFC', cursor: 'no-drop' }}>Signup here</a></span>
             </div>
           </div>
         </div>
