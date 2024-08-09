@@ -19,6 +19,12 @@
   background-color: transparent !important;
   color: #5d5959 !important;
 }
+.css-hyum1k-MuiToolbar-root {
+  min-height: 0 !important;
+}
+.css-12i7wg6-MuiPaper-root-MuiDrawer-paper {
+  background-color: #6a5acd !important;
+}
 /* .css-h4y409-MuiList-root div:hover {
   color: rgb(98, 109, 205) !important; */
 /* border: none !important; */

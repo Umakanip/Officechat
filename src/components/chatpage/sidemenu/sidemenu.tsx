@@ -159,6 +159,7 @@ const menuItems = [
   { text: "Chat", component: "chat", icon: <FaComments /> },
   { text: "Teams", component: "teams", icon: <FaUsers /> },
 ];
+console.log("menu items :", menuItems);
 
 interface GroupChat {
   id: number;
@@ -246,7 +247,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", }}>
       <CssBaseline />
       <Drawer
         variant="permanent"
@@ -256,13 +257,15 @@ const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
+            marginTop: "64px",
           },
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: "auto", bgcolor: "#c0c0c0" }}>
+        <Box sx={{ overflow: "auto", bgcolor: "#6a5acd", color: "white" }}>
           <List>
             {menuItems.map((item, index) => (
+              console.log("item:", item),
               <ListItem
                 button
                 key={index}
@@ -271,17 +274,14 @@ const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
                   flexDirection: "column",
                   alignItems: "center",
                   textAlign: "center",
-                  backgroundColor:
-                    selectedComponent === item.component
-                      ? "#e0e0e0"
-                      : "transparent", // Highlight active item
+                  backgroundColor:"transparent", // Highlight active item
                   borderLeft:
                     selectedComponent === item.component
                       ? "2px solid rgb(98, 109, 205)"
                       : "none", // Border for active item
                   color:
                     selectedComponent === item.component
-                      ? "rgb(98, 109, 205)"
+                      ? "#4a4a4a"
                       : "none", // Border for active item
                 }}
               >
