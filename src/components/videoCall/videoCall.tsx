@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack, IRemoteUser } from 'agora-rtc-sdk-ng';
 import './main.css';
 
-const APP_ID = "9fee5942271f49f3bb2897cf9a6b5e48";
+const APP_ID = "1369151da2df4f33bdd842b8c0797085";
 const TOKEN = "007eJxTYJjPaWO8ylPnj3utVqXFukU18x/pOVfHrovZk1ZYp7bOK1yBwTItNdXU0sTIyNwwzcQyzTgpycjC0jw5zTLRLMk01cSi8u6GtIZARoa3RaUMjFAI4rMw+CZm5jEwAADY2h6L";
 const CHANNEL = "Main";
 

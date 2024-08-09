@@ -14,10 +14,18 @@ import { Message, Group, User } from "./messagetypes.ts";
 import GroupIcon from "@mui/icons-material/Group";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import { useUser } from "../../context/UserContext.tsx";
+import io from 'socket.io-client';
+import AgoraRTC, { IAgoraRTCClient } from 'agora-rtc-sdk-ng';
+import AgoraClient from "../../VoiceCall/AgoraClient.tsx";
+import { AgoraRTCProvider } from 'agora-rtc-react';
+import CallIcon from '@mui/icons-material/Call';
+import CallPopup from "../../VoiceCall/CallPopup.tsx";
+
+const socket = io('http://localhost:5000');
 
 interface HeaderProps {
   selectedUser: User;
-  onGroupCreate;
+  onGroupCreate: (group: any) => void;
   headerTitle: string | undefined;
 }
 
@@ -31,12 +39,78 @@ const Header: React.FC<HeaderProps> = ({
   const [suggestions, setSuggestions] = useState<User[]>([]);
   const [selectedUserIDs, setSelectedUserIDs] = useState<number[]>([]);
   const [groupDetails, setGroupDetails] = useState();
-  const { groups, setGroups, activeGroup, setActiveGroup, setActiveUser } =
+  const { groups, setGroups, activeGroup, setActiveGroup, setActiveUser, user } =
     useUser();
   // const [headerTitle, setHeaderTitle] = useState<string>();
+
+
+  const [channelName, setChannelName] = useState<string>('');
+  const [token, setToken] = useState<string>('');
+  const [incomingCall, setIncomingCall] = useState<string | null>(null);
+
   useEffect(() => {
-    console.log("headerTitle", selectedUser);
-  });
+    socket.emit('register', user?.userdata?.UserID);
+
+    socket.on('incomingCall', (data: { channelName: string, token: string, callerId: string }) => {
+      setChannelName(data.channelName);
+      setToken(data.token);
+      setIncomingCall(data.callerId);
+      console.log("Incoming call data", data);
+    });
+
+    socket.on('callAccepted', ({ channelName, callerId }) => {
+      console.log(`Call accepted by ${callerId}`);
+      setChannelName(channelName);
+      setToken(token);
+    });
+
+    socket.on('callRejected', ({ callerId }) => {
+      console.log(`Call rejected by ${callerId}`);
+      setIncomingCall(null);
+      setChannelName('');
+      setToken('');
+    });
+
+    return () => {
+      socket.off('incomingCall');
+      socket.off('callAccepted');
+      socket.off('callRejected');
+    };
+  }, [token, user]);
+
+  const startCall = () => {
+    if (!selectedUser) return; // Handle case where selectedUser might be null
+
+    const generatedChannelName = 'testChannel';
+    const callerId = user?.userdata?.UserID;
+    const receiverId = selectedUser?.UserID;
+    
+    console.log('Starting call with:', {
+      channelName: generatedChannelName,
+      callerId,
+      receiverIds: [receiverId],
+    });
+
+    socket.emit('callUsers', { channelName: generatedChannelName, callerId, receiverIds: [receiverId] });
+  };
+
+  const acceptCall = () => {
+    if (incomingCall) {
+      console.log('Call accepted');
+      socket.emit('callAccepted', { channelName, callerId: incomingCall });
+      // Agora client connection will be handled in AgoraClient component
+      setIncomingCall(null);
+    }
+  };
+
+  const rejectCall = () => {
+    if (incomingCall) {
+      console.log('Call rejected');
+      socket.emit('callRejected', { channelName, callerId: incomingCall });
+      setIncomingCall(null);
+    }
+  };
+
   const handlePopoverOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -51,10 +125,10 @@ const Header: React.FC<HeaderProps> = ({
     setAnchorEl(null);
   };
 
-  const fetchSuggestions = async (searchQuery) => {
+  const fetchSuggestions = async (searchQuery: string) => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/usernamesugggestions?",
+        "http://localhost:3000/api/usernamesuggestions",
         {
           params: { query: searchQuery },
         }
@@ -69,31 +143,24 @@ const Header: React.FC<HeaderProps> = ({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
-    setQuery(value); // Update the query state
+    setQuery(value);
     if (value) {
-      fetchSuggestions(value); // Fetch suggestions if there's input
+      fetchSuggestions(value);
     } else {
-      setSuggestions([]); // Clear suggestions if input is empty
+      setSuggestions([]);
     }
   };
 
   const handleCreateGroup = async () => {
-    // Handle the "Create" button logic here
-    console.log("Email:Email:", selectedUserIDs);
-    console.log("Email:", (selectedUser as User).UserID || null);
     const namesArray = query
       .split(",")
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
-    const groupname = [(selectedUser as User).Username, ...namesArray].join(
-      ", "
-    );
-    // let userIDs = [1, 4, 5];
+    const groupname = [(selectedUser as User).Username, ...namesArray].join(", ");
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/creategroup?`,
+        "http://localhost:3000/api/creategroup",
         {
-          // Email: groupEmail,
           GroupName: groupname,
           Username: [(selectedUser as User).Username, ...namesArray],
           CreatedBy: (selectedUser as User).UserID || null,
@@ -105,36 +172,31 @@ const Header: React.FC<HeaderProps> = ({
           },
         }
       );
-      console.log("REsponse", response.data);
+      console.log("Response", response.data);
       setGroupDetails(response.data);
       const newGroup = response.data;
 
       setGroups((prevGroups) => [newGroup, ...prevGroups]);
       setActiveGroup(response.data.GroupID);
       setActiveUser(null);
-      // Update the selectedUser with the new group information if needed
-      onGroupCreate(newGroup); // Pass the new group information
-      setQuery(""); // Clear the input
-
-      handlePopoverClose(); // Close the popover after action
-      // setHeaderTitle(response.data.group.GroupName);
-    } catch (error: any) {
+      onGroupCreate(newGroup);
+      setQuery("");
+      handlePopoverClose();
+    } catch (error) {
       console.error("Error sending data:", error);
     }
   };
 
-  const { UserID, Username, GroupName, ProfilePicture, GroupID } = selectedUser;
-  const namesArray = query
-    .split(",")
-    .map((name) => name.trim())
-    .filter((name) => name.length > 0);
   const handleAddUser = async () => {
+    const namesArray = query
+      .split(",")
+      .map((name) => name.trim())
+      .filter((name) => name.length > 0);
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/addUsers?`,
+        "http://localhost:3000/api/addUsers",
         {
-          // Email: groupEmail,
-          GroupID: GroupID,
+          GroupID: (selectedUser as User).GroupID,
           Usernames: namesArray || null,
         },
         {
@@ -143,30 +205,26 @@ const Header: React.FC<HeaderProps> = ({
           },
         }
       );
-      console.log("REsponse", response.data.insertedMembers[0].Username);
-      console.log("REsponse", response.data.group);
+      console.log("Response", response.data.insertedMembers[0].Username);
+      console.log("Response", response.data.group);
       const updatedGroup = response.data.group;
-      setGroupDetails(updatedGroup); // Update with new group details
-      setActiveGroup(updatedGroup.GroupID); // Ensure active group is updated
+      setGroupDetails(updatedGroup);
+      setActiveGroup(updatedGroup.GroupID);
       setActiveUser(null);
-      // setGroupDetails(response.data.group);
-      // setHeaderTitle(response.data.group.GroupName);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error sending data:", error);
     }
   };
+
   const handleSelectUser = (username) => {
-    console.log("user id check", username);
-    setSelectedUserIDs(username); // Add selected UserID to the array
-    // setQuery(""); // Clear the input field
-    setSuggestions([]); // Clear the suggestions
+    console.log("User selected:", username);
+    setSelectedUserIDs(username);
+    setSuggestions([]);
   };
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  console.log("(selectedUser as User).UserID", selectedUser);
-  console.log(selectedUser ? groupDetails : "");
-  // const { groupname } = groupDetails;
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -184,26 +242,27 @@ const Header: React.FC<HeaderProps> = ({
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Avatar
-                  alt={UserID ? Username || "User" : GroupName || "Group"}
-                  src={ProfilePicture || undefined}
+                  alt={selectedUser.UserID ? selectedUser.Username || "User" : selectedUser.GroupName || "Group"}
+                  src={selectedUser.ProfilePicture || undefined}
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
-                  {UserID ? Username || "User" : GroupName || "Group"}
+                  {selectedUser.UserID ? selectedUser.Username || "User" : selectedUser.GroupName || "Group"}
                 </Typography>
               </Box>
-              {/* <GroupIcon
-              style={{ cursor: "pointer" }}
-              sx={{ color: "black" }}
-              onClick={handleDialogOpen} // Open dialog on click
-            /> */}
-             <IconButton
-                sx={{ marginLeft: "auto", color: "#1976d2" }} // Ensure the icon is visible on dark background
-                onClick={handleVideoClick}>
-                <VideocamIcon sx={{ fontSize: 30 }} /> {/* Adjust the font size as needed */}
+
+              <IconButton onClick={startCall} sx={{ marginLeft: "0px", color: "#1976d2" }}>
+                <CallIcon />
               </IconButton>
+
               <IconButton
-                sx={{ color: "black" }} // Ensure the icon is visible on dark background
+                sx={{ marginLeft: "auto", color: "#1976d2" }}
+                onClick={handleVideoClick}>
+                <VideocamIcon sx={{ fontSize: 30 }} />
+              </IconButton>
+
+              <IconButton
+                sx={{ color: "black" }}
                 onClick={handlePopoverOpen}
               >
                 <GroupIcon />
@@ -232,48 +291,59 @@ const Header: React.FC<HeaderProps> = ({
                   value={query}
                   onChange={handleEmailChange}
                   variant="outlined"
+                  size="small"
+                  fullWidth
                 />
-                {suggestions.length > 0 && (
-                  <ul>
-                    {suggestions.map((suggestion: any) => (
-                      <li
-                        onClick={() => handleSelectUser(suggestion)} // Handle user selection
-                      >
-                        {suggestion} {/* Display UserName */}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
-                >
-                  <Button onClick={handlePopoverClose} variant="outlined">
-                    Cancel
-                  </Button>
-                  {GroupID ? (
-                    <Button
-                      onClick={handleAddUser}
-                      variant="contained"
-                      color="primary"
+                <Box sx={{ maxHeight: "200px", overflowY: "auto" }}>
+                  {suggestions.map((user) => (
+                    <Box
+                      key={user.UserID}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        p: 1,
+                        borderBottom: "1px solid #ddd",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleSelectUser(user.Username)}
                     >
-                      Add User
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleCreateGroup}
-                      variant="contained"
-                      color="primary"
-                    >
-                      Create
-                    </Button>
-                  )}
+                      <Avatar
+                        alt={user.Username || "User"}
+                        src={user.ProfilePicture || undefined}
+                        sx={{ mr: 2 }}
+                      />
+                      <Typography variant="body2">{user.Username}</Typography>
+                    </Box>
+                  ))}
                 </Box>
+                <Button variant="contained" onClick={handleCreateGroup}>
+                  Create Group
+                </Button>
+                <Button variant="contained" onClick={handleAddUser}>
+                  Add User
+                </Button>
               </Box>
             </Popover>
           </Box>
         ) : (
-          <Typography variant="h5" sx={{ p: 2, mt: 20 }}></Typography>
+          <Box sx={{ bgcolor: "#064D51", p: 3 }}>
+            <Typography variant="h6" color="white">
+              {headerTitle}
+            </Typography>
+          </Box>
         )}
+
+        {/* Conditionally render CallPopup based on incomingCall state */}
+        {incomingCall && (
+          <CallPopup
+            incomingCall={incomingCall}
+            caller={selectedUser}
+            onAccept={acceptCall}
+            onReject={rejectCall}
+          />
+        )}
+
+        {token && <AgoraClient channelName={channelName} token={token} />}
       </Box>
     </>
   );
