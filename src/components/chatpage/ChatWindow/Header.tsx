@@ -14,14 +14,14 @@ import { Message, Group, User } from "./messagetypes.ts";
 import GroupIcon from "@mui/icons-material/Group";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import { useUser } from "../../context/UserContext.tsx";
-import io from 'socket.io-client';
-import AgoraRTC, { IAgoraRTCClient } from 'agora-rtc-sdk-ng';
+import io from "socket.io-client";
+import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng";
 import AgoraClient from "../../VoiceCall/AgoraClient.tsx";
-import { AgoraRTCProvider } from 'agora-rtc-react';
-import CallIcon from '@mui/icons-material/Call';
+import { AgoraRTCProvider } from "agora-rtc-react";
+import CallIcon from "@mui/icons-material/Call";
 import CallPopup from "../../VoiceCall/CallPopup.tsx";
 
-const socket = io('http://localhost:5000');
+const socket = io("http://localhost:5000");
 
 interface HeaderProps {
   selectedUser: User;
@@ -39,65 +39,77 @@ const Header: React.FC<HeaderProps> = ({
   const [suggestions, setSuggestions] = useState<User[]>([]);
   const [selectedUserIDs, setSelectedUserIDs] = useState<number[]>([]);
   const [groupDetails, setGroupDetails] = useState();
-  const { groups, setGroups, activeGroup, setActiveGroup, setActiveUser, user } =
-    useUser();
+  const {
+    groups,
+    setGroups,
+    activeGroup,
+    setActiveGroup,
+    setActiveUser,
+    user,
+  } = useUser();
   // const [headerTitle, setHeaderTitle] = useState<string>();
 
-
-  const [channelName, setChannelName] = useState<string>('');
-  const [token, setToken] = useState<string>('');
+  const [channelName, setChannelName] = useState<string>("");
+  const [token, setToken] = useState<string>("");
   const [incomingCall, setIncomingCall] = useState<string | null>(null);
 
   useEffect(() => {
-    socket.emit('register', user?.userdata?.UserID);
+    socket.emit("register", user?.userdata?.UserID);
 
-    socket.on('incomingCall', (data: { channelName: string, token: string, callerId: string }) => {
-      setChannelName(data.channelName);
-      setToken(data.token);
-      setIncomingCall(data.callerId);
-      console.log("Incoming call data", data);
-    });
+    socket.on(
+      "incomingCall",
+      (data: { channelName: string; token: string; callerId: string }) => {
+        setChannelName(data.channelName);
+        setToken(data.token);
+        setIncomingCall(data.callerId);
+        console.log("Incoming call data", data);
+      }
+    );
 
-    socket.on('callAccepted', ({ channelName, callerId }) => {
+    socket.on("callAccepted", ({ channelName, callerId }) => {
       console.log(`Call accepted by ${callerId}`);
       setChannelName(channelName);
       setToken(token);
     });
 
-    socket.on('callRejected', ({ callerId }) => {
+    socket.on("callRejected", ({ callerId }) => {
       console.log(`Call rejected by ${callerId}`);
       setIncomingCall(null);
-      setChannelName('');
-      setToken('');
+      setChannelName("");
+      setToken("");
     });
 
     return () => {
-      socket.off('incomingCall');
-      socket.off('callAccepted');
-      socket.off('callRejected');
+      socket.off("incomingCall");
+      socket.off("callAccepted");
+      socket.off("callRejected");
     };
   }, [token, user]);
 
   const startCall = () => {
     if (!selectedUser) return; // Handle case where selectedUser might be null
 
-    const generatedChannelName = 'testChannel';
+    const generatedChannelName = "testChannel";
     const callerId = user?.userdata?.UserID;
     const receiverId = selectedUser?.UserID;
-    
-    console.log('Starting call with:', {
+
+    console.log("Starting call with:", {
       channelName: generatedChannelName,
       callerId,
       receiverIds: [receiverId],
     });
 
-    socket.emit('callUsers', { channelName: generatedChannelName, callerId, receiverIds: [receiverId] });
+    socket.emit("callUsers", {
+      channelName: generatedChannelName,
+      callerId,
+      receiverIds: [receiverId],
+    });
   };
 
   const acceptCall = () => {
     if (incomingCall) {
-      console.log('Call accepted');
-      socket.emit('callAccepted', { channelName, callerId: incomingCall });
+      console.log("Call accepted");
+      socket.emit("callAccepted", { channelName, callerId: incomingCall });
       // Agora client connection will be handled in AgoraClient component
       setIncomingCall(null);
     }
@@ -105,8 +117,8 @@ const Header: React.FC<HeaderProps> = ({
 
   const rejectCall = () => {
     if (incomingCall) {
-      console.log('Call rejected');
-      socket.emit('callRejected', { channelName, callerId: incomingCall });
+      console.log("Call rejected");
+      socket.emit("callRejected", { channelName, callerId: incomingCall });
       setIncomingCall(null);
     }
   };
@@ -156,7 +168,9 @@ const Header: React.FC<HeaderProps> = ({
       .split(",")
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
-    const groupname = [(selectedUser as User).Username, ...namesArray].join(", ");
+    const groupname = [(selectedUser as User).Username, ...namesArray].join(
+      ", "
+    );
     try {
       const response = await axios.post(
         "http://localhost:3000/api/creategroup",
@@ -242,29 +256,36 @@ const Header: React.FC<HeaderProps> = ({
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Avatar
-                  alt={selectedUser.UserID ? selectedUser.Username || "User" : selectedUser.GroupName || "Group"}
+                  alt={
+                    selectedUser.UserID
+                      ? selectedUser.Username || "User"
+                      : selectedUser.GroupName || "Group"
+                  }
                   src={selectedUser.ProfilePicture || undefined}
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
-                  {selectedUser.UserID ? selectedUser.Username || "User" : selectedUser.GroupName || "Group"}
+                  {selectedUser.UserID
+                    ? selectedUser.Username || "User"
+                    : selectedUser.GroupName || "Group"}
                 </Typography>
               </Box>
 
-              <IconButton onClick={startCall} sx={{ marginLeft: "0px", color: "#1976d2" }}>
+              <IconButton
+                onClick={startCall}
+                sx={{ marginLeft: "0px", color: "#1976d2" }}
+              >
                 <CallIcon />
               </IconButton>
 
               <IconButton
                 sx={{ marginLeft: "auto", color: "#1976d2" }}
-                onClick={handleVideoClick}>
+                onClick={handleVideoClick}
+              >
                 <VideocamIcon sx={{ fontSize: 30 }} />
               </IconButton>
 
-              <IconButton
-                sx={{ color: "black" }}
-                onClick={handlePopoverOpen}
-              >
+              <IconButton sx={{ color: "black" }} onClick={handlePopoverOpen}>
                 <GroupIcon />
               </IconButton>
             </Box>
