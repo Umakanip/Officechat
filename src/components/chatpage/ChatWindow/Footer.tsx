@@ -16,6 +16,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { useUser } from "../../context/UserContext.tsx";
@@ -170,6 +171,10 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
                   </IconButton>
                 </Tooltip>
               ) : null,
+              sx: {
+                borderRadius: "20px",
+                height: "40px"
+              },
             }}
           />
           {filePreview && (
@@ -197,14 +202,13 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
             </Box>
           )}
         </Box>
-        <Button
+        <IconButton
           onClick={sendMessage}
-          variant="contained"
           color="primary"
           style={{ marginLeft: "10px" }}
         >
-          &#9658;
-        </Button>
+        <SendIcon />
+        </IconButton>
         <IconButton onClick={handleClick} style={{ marginLeft: "10px" }}>
           <AttachFileIcon />
         </IconButton>

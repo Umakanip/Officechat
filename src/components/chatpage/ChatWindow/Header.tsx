@@ -249,9 +249,9 @@ const Header: React.FC<HeaderProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                bgcolor: "#064D51",
+                bgcolor: "#dbd5d1",
                 p: 3,
-                mt: -8,
+                height: 65,
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>

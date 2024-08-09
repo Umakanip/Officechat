@@ -176,9 +176,10 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
     <Box
       sx={{
         width: "400px",
-        bgcolor: "#ebebeb",
+        bgcolor: "#dbd5d1",
         display: "flex",
         flexDirection: "column",
+        border: "1px solid #bdbdbd",
       }}
     >
       {" "}
@@ -195,7 +196,16 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
       >
         Chat
       </Typography>
-      <List sx={{ flexGrow: 1, overflow: "auto", height: "250px" }}>
+      <List
+        sx={{
+          flexGrow: 1,
+          overflow: "auto",
+          height: "250px",
+          '&::-webkit-scrollbar': {
+            width: '1px',  
+          },
+        }}
+      >
         {" "}
         {/* Allow list to scroll */}
         {Contact?.map((item) => {
