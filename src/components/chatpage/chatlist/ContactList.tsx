@@ -231,8 +231,8 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
                     alt={item.Username}
                     src={item.ProfilePicture}
                     sx={{
-                      width: 56,
-                      height: 56,
+                      width: 45,
+                      height: 45,
                       borderRadius: "50%",
                       // border: item.Status ? "2px solid #4caf50" : "none",
                       position: "relative",
@@ -243,7 +243,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
                       sx={{
                         position: "absolute",
                         bottom: 0,
-                        right: 0,
+                        right: 7,
                         width: 16,
                         height: 16,
                         borderRadius: "50%",
@@ -258,7 +258,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
                 primary={item.Username}
                 secondary={
                   <Typography variant="body2" color="textSecondary">
-                    Some Text to write
+                    Click here to chat
                   </Typography>
                 }
               />

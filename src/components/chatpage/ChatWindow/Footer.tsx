@@ -131,15 +131,14 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
   }, [userDetails.UserID, setMessageList]);
 
   return (
-    <Container>
+    <Container sx={{ mt: "auto" }}>
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "left",
           p: 2,
           borderTop: 1,
           borderColor: "divider",
-          position: "relative",
         }}
       >
         <Box sx={{ position: "relative", flexGrow: 1 }}>
@@ -147,7 +146,7 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
             fullWidth
             variant="outlined"
             value={currentMessage}
-            placeholder="Hey..."
+            placeholder="Type a message.."
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setcurrentMessage(event.target.value);
             }}
@@ -172,7 +171,7 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
                 </Tooltip>
               ) : null,
               sx: {
-                borderRadius: "20px",
+                borderRadius: "8px",
                 height: "40px"
               },
             }}
@@ -205,11 +204,11 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
         <IconButton
           onClick={sendMessage}
           color="primary"
-          style={{ marginLeft: "10px" }}
+          style={{ marginLeft: "5px" }}
         >
         <SendIcon />
         </IconButton>
-        <IconButton onClick={handleClick} style={{ marginLeft: "10px" }}>
+        <IconButton onClick={handleClick}>
           <AttachFileIcon />
         </IconButton>
         <Menu
