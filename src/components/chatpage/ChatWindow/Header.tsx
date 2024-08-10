@@ -15,9 +15,8 @@ import GroupIcon from "@mui/icons-material/Group";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import { useUser } from "../../context/UserContext.tsx";
 import io from "socket.io-client";
-import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng";
+import Suggestions from "../Header/Suggestions.tsx";
 import AgoraClient from "../../VoiceCall/AgoraClient.tsx";
-import { AgoraRTCProvider } from "agora-rtc-react";
 import CallIcon from "@mui/icons-material/Call";
 import CallPopup from "../../VoiceCall/CallPopup.tsx";
 
@@ -47,10 +46,10 @@ const Header: React.FC<HeaderProps> = ({
     setActiveUser,
     user,
   } = useUser();
-  // const [headerTitle, setHeaderTitle] = useState<string>();
-
   const [channelName, setChannelName] = useState<string>("");
   const [token, setToken] = useState<string>("");
+  // const [searchSuggestions, setSearchSuggestions] = useState<User[]>([]);
+  const [suggestionsVisible, setSuggestionsVisible] = useState(false);
   const [incomingCall, setIncomingCall] = useState<string | null>(null);
 
   useEffect(() => {
@@ -140,12 +139,14 @@ const Header: React.FC<HeaderProps> = ({
   const fetchSuggestions = async (searchQuery: string) => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/usernamesuggestions",
+        "http://localhost:3000/api/usernamesugggestions",
         {
           params: { query: searchQuery },
         }
       );
+      console.log("resssssssssssss", response.data);
       setSuggestions(response.data);
+      setSuggestionsVisible(true);
     } catch (error) {
       console.error("Error fetching suggestions:", error);
     }
@@ -160,6 +161,7 @@ const Header: React.FC<HeaderProps> = ({
       fetchSuggestions(value);
     } else {
       setSuggestions([]);
+      setSuggestionsVisible(false);
     }
   };
 
@@ -232,8 +234,10 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleSelectUser = (username) => {
     console.log("User selected:", username);
+    setQuery(username);
     setSelectedUserIDs(username);
     setSuggestions([]);
+    setSuggestionsVisible(false);
   };
 
   const open = Boolean(anchorEl);
@@ -315,28 +319,13 @@ const Header: React.FC<HeaderProps> = ({
                   size="small"
                   fullWidth
                 />
-                <Box sx={{ maxHeight: "200px", overflowY: "auto" }}>
-                  {suggestions.map((user) => (
-                    <Box
-                      key={user.UserID}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        p: 1,
-                        borderBottom: "1px solid #ddd",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleSelectUser(user.Username)}
-                    >
-                      <Avatar
-                        alt={user.Username || "User"}
-                        src={user.ProfilePicture || undefined}
-                        sx={{ mr: 2 }}
-                      />
-                      <Typography variant="body2">{user.Username}</Typography>
-                    </Box>
-                  ))}
-                </Box>
+                {suggestionsVisible && (
+                  <Suggestions
+                    suggestions={suggestions}
+                    onSelect={handleSelectUser}
+                  />
+                )}
+
                 <Button variant="contained" onClick={handleCreateGroup}>
                   Create Group
                 </Button>

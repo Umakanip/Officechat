@@ -13,6 +13,7 @@ export interface Message {
   IsPinned: boolean;
 }
 export interface User {
+  name: any;
   UserID: number;
   Username: string;
   ProfilePicture: undefined;

@@ -65,6 +65,13 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     }
   }, [userDetails]);
 
+  // Ensure header updates with the selected user
+  useEffect(() => {
+    if (selectedUser) {
+      setHeaderTitle(selectedUser.Username || "User");
+    }
+  }, [selectedUser]);
+
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
