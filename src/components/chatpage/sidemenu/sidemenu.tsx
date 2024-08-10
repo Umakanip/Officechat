@@ -262,7 +262,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: "auto", bgcolor: "#6a5acd", color: "white" }}>
+        <Box sx={{ overflow: "auto", bgcolor: "#485872", color: "white", borderTop: "0.5px solid #dbd5d1" }}>
           <List>
             {menuItems.map((item, index) => (
               console.log("item:", item),
@@ -281,7 +281,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
                       : "none", // Border for active item
                   color:
                     selectedComponent === item.component
-                      ? "#4a4a4a"
+                      ? "#3e849e"
                       : "none", // Border for active item
                 }}
               >
