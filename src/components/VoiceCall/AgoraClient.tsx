@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 
 interface AgoraClientProps {
   channelName: string;
-  token: string;
+  token: string;  
 }
 
 const AgoraClient: FC<AgoraClientProps> = ({ channelName, token }) => {
@@ -80,3 +80,86 @@ const AgoraClient: FC<AgoraClientProps> = ({ channelName, token }) => {
 };
 
 export default AgoraClient;
+
+// import React, { FC, useEffect } from 'react';
+// import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack } from 'agora-rtc-sdk-ng';
+// import { io } from 'socket.io-client';
+
+// interface AgoraClientProps {
+//   channelName: string;
+//   token: string;
+// }
+
+// const AgoraClient: FC<AgoraClientProps> = ({ channelName, token }) => {
+//   const appId: string = "1369151da2df4f33bdd842b8c0797085"; // Replace with your actual Agora App ID
+//   const socket = io();
+
+//   useEffect(() => {
+//     const client: IAgoraRTCClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+
+//     const init = async () => {
+//       try {
+//         // Join the channel
+//         await client.join(appId, channelName, token, null);
+//         console.log('Joined channel successfully');
+
+//         // Listen for call acceptance
+//         socket.on('callAccepted', async () => {
+//           try {
+//             // Create and publish a local audio track only if the call is accepted
+//             const localAudioTrack: IMicrophoneAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+//             await client.publish([localAudioTrack]);
+//             console.log('Published audio track successfully');
+//           } catch (error) {
+//             console.error('Failed to create or publish audio track:', error);
+//           }
+//         });
+
+//         // Handle call rejection
+//         socket.on('callRejected', () => {
+//           console.log('The call was rejected.');
+//           // Optionally, handle rejection (e.g., notify the caller, close the call interface)
+//         });
+
+//         // Subscribe to remote users
+//         client.on('user-published', async (user, mediaType) => {
+//           try {
+//             console.log('User published:', user);
+//             await client.subscribe(user, mediaType);
+//             console.log('Subscribed to user:', user);
+//             if (mediaType === 'audio') {
+//               console.log('Playing audio track');
+//               user.audioTrack?.play();
+//             }
+//           } catch (error) {
+//             console.error('Failed to subscribe to user:', error);
+//           }
+//         });
+        
+//       } catch (error) {
+//         console.error('Failed to join the channel:', error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       const leaveChannel = async () => {
+//         try {
+//           await client.leave();
+//           client.remoteUsers.forEach((user) => {
+//             if (user.audioTrack) user.audioTrack.stop();
+//           });
+//           console.log('Left the channel successfully');
+//         } catch (error) {
+//           console.error('Failed to leave the channel:', error);
+//         }
+//       };
+//       leaveChannel();
+//     };
+//   }, [appId, channelName, token, socket]);
+
+//   return <div></div>;
+// };
+
+// export default AgoraClient;
