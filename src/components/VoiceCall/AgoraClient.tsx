@@ -1,3 +1,69 @@
+// last one
+
+// import React, { useEffect } from "react"; // Import React and useEffect
+// import AgoraRTC, {
+//   IAgoraRTCClient,
+//   ILocalAudioTrack,
+//   IRemoteAudioTrack,
+//   IMicrophoneAudioTrack,
+//   UID,
+// } from "agora-rtc-sdk-ng";
+
+// interface AgoraClientProps {
+//   channelName: string;
+//   token: string;
+//   isCallAccepted: boolean; // Prop to determine if the call is accepted
+// }
+
+// const AgoraClient: React.FC<AgoraClientProps> = ({
+//   channelName,
+//   token,
+//   isCallAccepted,
+// }) => {
+//   const rtcClient: IAgoraRTCClient = AgoraRTC.createClient({
+//     mode: "rtc",
+//     codec: "vp8",
+//   });
+
+//   useEffect(() => {
+//     const joinChannel = async () => {
+//       try {
+//         await rtcClient.join(token, channelName, null);
+
+//         // Listen for the "user-published" event even before the call is accepted
+//         rtcClient.on("user-published", async (user, mediaType) => {
+//           await rtcClient.subscribe(user, mediaType);
+//           if (mediaType === "audio") {
+//             const remoteAudioTrack: IRemoteAudioTrack = user.audioTrack!;
+//             remoteAudioTrack.play();
+//           }
+//         });
+
+//         // Only create and publish the local audio track if the call is accepted
+//         if (isCallAccepted) {
+//           const localAudioTrack: IMicrophoneAudioTrack =
+//             await AgoraRTC.createMicrophoneAudioTrack();
+//           await rtcClient.publish([localAudioTrack]);
+//         }
+//       } catch (error) {
+//         console.error("Error joining channel:", error);
+//       }
+//     };
+
+//     joinChannel();
+
+//     return () => {
+//       rtcClient.leave();
+//     };
+//   }, [rtcClient, channelName, token, isCallAccepted]);
+
+//   return <div></div>;
+// };
+
+// export default AgoraClient;
+
+
+
 import React, { FC, useEffect } from 'react';
 import AgoraRTC, { IAgoraRTCClient, IAgoraRTCRemoteUser, IMicrophoneAudioTrack, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import { io } from 'socket.io-client';

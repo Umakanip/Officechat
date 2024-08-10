@@ -1,6 +1,354 @@
+// import axios from "axios";
+// import React, { MouseEvent, useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import {
+//   Box,
+//   IconButton,
+//   Popover,
+//   Typography,
+//   Avatar,
+//   Button,
+//   TextField,
+// } from "@mui/material";
+// import { User } from "./messagetypes";
+// import GroupIcon from "@mui/icons-material/Group";
+// import VideocamIcon from "@mui/icons-material/Videocam";
+// import { useUser } from "../../context/UserContext.tsx";
+// import io from "socket.io-client";
+// import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng";
+// import { AgoraRTCProvider } from "agora-rtc-react";
+// import CallIcon from "@mui/icons-material/Call";
+// import CallPopup from "../../VoiceCall/CallPopup.tsx";
+// import AgoraClient from "../../VoiceCall/AgoraClient.tsx";
+
+// interface HeaderProps {
+//   selectedUser: User;
+//   onGroupCreate: (group: any) => void;
+//   headerTitle?: string;
+// }
+
+// const socket = io("http://localhost:5000");
+// const rtcClient: IAgoraRTCClient = AgoraRTC.createClient({
+//   mode: "rtc",
+//   codec: "vp8",
+// });
+
+// const Header: React.FC<HeaderProps> = ({
+//   headerTitle,
+//   selectedUser,
+//   onGroupCreate,
+// }) => {
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [query, setQuery] = useState<string>("");
+//   const [suggestions, setSuggestions] = useState<User[]>([]);
+//   const [selectedUserIDs, setSelectedUserIDs] = useState<string[]>([]); // Change type to string[]
+//   const [groupDetails, setGroupDetails] = useState<any>();
+//   const { groups, setGroups, setActiveGroup, setActiveUser, user } = useUser();
+//   const [channelName, setChannelName] = useState<string>("");
+//   const [token, setToken] = useState<string>("");
+//   const [incomingCall, setIncomingCall] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     socket.emit("register", user?.userdata?.UserID);
+
+//     socket.on(
+//       "incomingCall",
+//       (data: { channelName: string; token: string; callerId: string }) => {
+//         setChannelName(data.channelName);
+//         setToken(data.token);
+//         setIncomingCall(data.callerId);
+//       }
+//     );
+
+//     socket.on("callAccepted", ({ channelName, callerId }) => {
+//       setChannelName(channelName);
+//       setToken(token);
+//     });
+
+//     socket.on("callRejected", ({ callerId }) => {
+//       setIncomingCall(null);
+//       setChannelName("");
+//       setToken("");
+//     });
+
+//     return () => {
+//       socket.off("incomingCall");
+//       socket.off("callAccepted");
+//       socket.off("callRejected");
+//     };
+//   }, [token]);
+
+//   const startCall = () => {
+//     const generatedChannelName = "testChannel";
+//     const callerId = user?.userdata?.UserID;
+//     const receiverIds = [selectedUser.UserID]; // Ensure receiverIds is an array
+
+//     socket.emit("callUsers", {
+//       channelName: generatedChannelName,
+//       callerId,
+//       receiverIds,
+//     });
+//   };
+
+//   const acceptCall = () => {
+//     if (incomingCall) {
+//       socket.emit("callAccepted", { channelName, callerId: incomingCall });
+//       setIncomingCall(null);
+//     }
+//   };
+
+//   const rejectCall = () => {
+//     if (incomingCall) {
+//       socket.emit("callRejected", { channelName, callerId: incomingCall });
+//       setIncomingCall(null);
+//     }
+//   };
+
+//   const handlePopoverOpen = (event: MouseEvent<HTMLElement>) => {
+//     setAnchorEl(event.currentTarget);
+//   };
+
+//   const navigate = useNavigate();
+
+//   const handleVideoClick = () => {
+//     navigate("/video-call");
+//   };
+
+//   const handlePopoverClose = () => {
+//     setAnchorEl(null);
+//   };
+
+//   const fetchSuggestions = async (searchQuery: string) => {
+//     try {
+//       const response = await axios.get(
+//         "http://localhost:3000/api/usernamesugggestions",
+//         {
+//           params: { query: searchQuery },
+//         }
+//       );
+//       setSuggestions(response.data);
+//     } catch (error) {
+//       console.error("Error fetching suggestions:", error);
+//     }
+//   };
+
+//   const handleEmailChange = async (
+//     event: React.ChangeEvent<HTMLInputElement>
+//   ) => {
+//     const value = event.target.value;
+//     setQuery(value);
+//     if (value) {
+//       fetchSuggestions(value);
+//     } else {
+//       setSuggestions([]);
+//     }
+//   };
+
+//   const handleCreateGroup = async () => {
+//     const namesArray = query
+//       .split(",")
+//       .map((name) => name.trim())
+//       .filter((name) => name.length > 0);
+//     const groupname = [(selectedUser as User).Username, ...namesArray].join(
+//       ", "
+//     );
+
+//     try {
+//       const response = await axios.post(
+//         `http://localhost:3000/api/creategroup`,
+//         {
+//           GroupName: groupname,
+//           Username: [(selectedUser as User).Username, ...namesArray],
+//           CreatedBy: (selectedUser as User).UserID || null,
+//           CreatedAt: new Date(),
+//         },
+//         {
+//           headers: {
+//             "Content-Type": "application/json",
+//           }
+//         }
+//       );
+
+//       const newGroup = response.data;
+//       setGroups((prevGroups) => [newGroup, ...prevGroups]);
+//       setActiveGroup(response.data.GroupID);
+//       setActiveUser(null);
+//       onGroupCreate(newGroup);
+//       setQuery("");
+//       handlePopoverClose();
+//     } catch (error: any) {
+//       console.error("Error sending data:", error);
+//     }
+//   };
+
+//   const { UserID, Username, GroupName, ProfilePicture, GroupID } =
+//     selectedUser;
+//   const namesArray = query
+//     .split(",")
+//     .map((name) => name.trim())
+//     .filter((name) => name.length > 0);
+
+//   const handleAddUser = async () => {
+//     try {
+//       const response = await axios.post(
+//         `http://localhost:3000/api/addUsers`,
+//         {
+//           GroupID: GroupID,
+//           Usernames: namesArray || null,
+//         },
+//         {
+//           headers: {
+//             "Content-Type": "application/json",
+//           }
+//         }
+//       );
+
+//       const updatedGroup = response.data.group;
+//       setGroupDetails(updatedGroup);
+//       setActiveGroup(updatedGroup.GroupID);
+//       setActiveUser(null);
+//     } catch (error: any) {
+//       console.error("Error sending data:", error);
+//     }
+//   };
+
+//   const handleSelectUser = (username: string) => {
+//     setSelectedUserIDs((prevIDs) => [...prevIDs, username]); // Add selected user ID to array
+//     setSuggestions([]);
+//   };
+
+//   const open = Boolean(anchorEl);
+//   const id = open ? "simple-popover" : undefined;
+
+//   return (
+//     <>
+//       <Box sx={{ flexGrow: 1 }}>
+//         {selectedUser ? (
+//           <Box>
+//             <Box
+//               sx={{
+//                 display: "flex",
+//                 alignItems: "center",
+//                 justifyContent: "space-between",
+//                 bgcolor: "#064D51",
+//                 p: 3,
+//                 mt: -8,
+//               }}
+//             >
+//               <Box sx={{ display: "flex", alignItems: "center" }}>
+//                 <Avatar
+//                   alt={UserID ? Username || "User" : GroupName || "Group"}
+//                   src={ProfilePicture || undefined}
+//                   sx={{ mr: 2 }}
+//                 />
+//                 <Typography variant="h6" color="white">
+//                   {UserID ? Username || "User" : GroupName || "Group"}
+//                 </Typography>
+//               </Box>
+//               <IconButton
+//                 onClick={() => {
+//                   startCall();
+//                 }}
+//                 sx={{ marginLeft: "0px", color: "#1976d2" }}
+//               >
+//                 <CallIcon />
+//               </IconButton>
+//               <AgoraRTCProvider client={rtcClient}>
+//   {incomingCall && selectedUser?.UserID ? (
+//     <CallPopup
+//       incomingCall={incomingCall}
+//       caller={selectedUser}
+//       onAccept={acceptCall}
+//       onReject={rejectCall}
+//     />
+//   ) : (
+//     <div></div>
+//   )}
+//   {token && (
+//     <AgoraClient
+//       channelName={channelName}
+//       token={token}
+//       isCallAccepted={isCallAccepted} // Pass the required prop here
+//     />
+//   )}
+// </AgoraRTCProvider>
+
+
+//               <IconButton
+//                 sx={{ marginLeft: "auto", color: "#1976d2" }}
+//                 onClick={handleVideoClick}
+//               >
+//                 <VideocamIcon sx={{ fontSize: 30 }} />
+//               </IconButton>
+//               <IconButton sx={{ color: "black" }} onClick={handlePopoverOpen}>
+//                 <GroupIcon />
+//               </IconButton>
+//             </Box>
+
+//             <Popover
+//               id={id}
+//               open={open}
+//               anchorEl={anchorEl}
+//               onClose={handlePopoverClose}
+//               anchorOrigin={{
+//                 vertical: "bottom",
+//                 horizontal: "right",
+//               }}
+//               transformOrigin={{
+//                 vertical: "top",
+//                 horizontal: "right",
+//               }}
+//               sx={{ p: 2 }}
+//             >
+//               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+//                 <TextField
+//                   label="Email ID"
+//                   type="email"
+//                   value={query}
+//                   onChange={handleEmailChange}
+//                   variant="outlined"
+//                 />
+//                 {suggestions.length > 0 && (
+//                   <Box>
+//                     {suggestions.map((user: User) => (
+//                       <Typography
+//                         key={user.UserID}
+//                         onClick={() => handleSelectUser(user.Username)}
+//                         sx={{ cursor: "pointer" }}
+//                       >
+//                         {user.Username}
+//                       </Typography>
+//                     ))}
+//                   </Box>
+//                 )}
+//                 <Button
+//                   variant="contained"
+//                   sx={{ mt: 2 }}
+//                   onClick={handleCreateGroup}
+//                 >
+//                   Create Group
+//                 </Button>
+//               </Box>
+//             </Popover>
+//           </Box>
+//         ) : (
+//           <Box sx={{ p: 3, mt: -8 }}>
+//             <Typography variant="h6" sx={{ color: "black" }}>
+//               {headerTitle || "Default Title"}
+//             </Typography>
+//           </Box>
+//         )}
+//       </Box>
+//     </>
+//   );
+// };
+
+// export default Header;
+
+
 import axios from "axios";
-import React, { MouseEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Box,
   IconButton,
@@ -15,7 +363,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import { useUser } from "../../context/UserContext.tsx";
 import io from 'socket.io-client';
-import AgoraRTC, { IAgoraRTCClient } from 'agora-rtc-sdk-ng';
+import AgoraRTC, { IAgoraRTCClient,IMicrophoneAudioTrack } from 'agora-rtc-sdk-ng';
 import AgoraClient from "../../VoiceCall/AgoraClient.tsx";
 import { AgoraRTCProvider } from 'agora-rtc-react';
 import CallIcon from '@mui/icons-material/Call';
@@ -44,95 +392,171 @@ const Header: React.FC<HeaderProps> = ({
   // const [headerTitle, setHeaderTitle] = useState<string>();
 
 
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("id");
   const [channelName, setChannelName] = useState<string>('');
   const [token, setToken] = useState<string>('');
+  const [callerId, setCallerId] = useState<string | null>(type);
   const [incomingCall, setIncomingCall] = useState<string | null>(null);
-  const [isCallPopupVisible, setIsCallPopupVisible] = useState(false);
-  var receiverIds: any = selectedUser?.UserID;
+  const [callAccepted, setCallAccepted] = useState<boolean>(false);
+  const localAudioTrackRef = useRef<IMicrophoneAudioTrack | null>(null);
+
   useEffect(() => {
-    console.log("user", user)
-    // const userId: string = type || '';
-    socket.emit('register', user?.userdata?.UserID);
+    if (type) {
+      // const userId = type; // Replace with actual user ID
+      socket.emit('register', user?.userdata?.UserID);
 
-    socket.on('incomingCall', (data: { channelName: string, token: string, callerId: string }) => {
-      setChannelName(data.channelName);
-      setToken(data.token);
-      setIncomingCall(data.callerId);
-      console.log("test", data)
-    });
+      socket.on('incomingCall', (data: { channelName: string; token: string; callerId: string }) => {
+        console.log('---incomingCall--client---', data);
+        setChannelName(data.channelName);
+        setToken(data.token);
+        setIncomingCall(data.callerId);
+      });
 
-    socket.on('callAccepted', ({ channelName, callerId }) => {
-      console.log(`Call accepted by ${callerId}`);
-      setChannelName(channelName);
-      setToken(token);
-    });
+      socket.on('connect', () => {
+        console.log('Connected to server');
+      });
 
-    socket.on('callRejected', ({ callerId }) => {
-      console.log(`Call rejected by ${callerId}`);
-      setIncomingCall(null);
-      setChannelName('');
-      setToken('');
-    });
+      socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+      });
+
+      return () => {
+        socket.off('incomingCall');
+        socket.off('connect');
+        socket.off('disconnect');
+      };
+    }
+  }, [type]);
+  //   console.log("user", user)
+  //   // const userId: string = type || '';
+  //   socket.emit('register', user?.userdata?.UserID);
+
+  //   socket.on('incomingCall', (data: { channelName: string, token: string, callerId: string }) => {
+  //     setChannelName(data.channelName);
+  //     setToken(data.token);
+  //     setIncomingCall(data.callerId);
+  //     console.log("test", data)
+  //   });
+
+  //   socket.on('callAccepted', ({ channelName, callerId }) => {
+  //     console.log(`Call accepted by ${callerId}`);
+  //     setChannelName(channelName);
+  //     setToken(token);
+  //   });
+
+  //   socket.on('callRejected', ({ callerId }) => {
+  //     console.log(`Call rejected by ${callerId}`);
+  //     setIncomingCall(null);
+  //     setChannelName('');
+  //     setToken('');
+  //   });
 
 
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
+  //   socket.on('connect', () => {
+  //     console.log('Connected to server');
+  //   });
 
-    socket.on('disconnect', () => {
-      console.log('Disconnected from server');
-    });
+  //   socket.on('disconnect', () => {
+  //     console.log('Disconnected from server');
+  //   });
 
-    // Cleanup on component unmount
-    return () => {
-      socket.off('incomingCall');
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('callAccepted');
-      socket.off('callRejected');
-    };
-  }, []);
+  //   // Cleanup on component unmount
+  //   return () => {
+  //     socket.off('incomingCall');
+  //     socket.off('connect');
+  //     socket.off('disconnect');
+  //     socket.off('callAccepted');
+  //     socket.off('callRejected');
+  //   };
+  // }, []);
 
 
-  const startCall = () => {
-    console.log("start call initialise")
-    // if (!selectedUser) return; // Handle case where selectedUser might be nul
+  // const startCall = () => {
+  //   console.log("start call initialise")
+  //   // if (!selectedUser) return; // Handle case where selectedUser might be nul
 
-   setIsCallPopupVisible(true);
+  //   const generatedChannelName = 'testChannel';
+  //   const callerId = user?.userdata?.UserID;
+  //   const receiverIds: any = selectedUser?.UserID;
+  //   alert(callerId)
+  //   console.log("user", user)
+  //   console.log("start call end", receiverIds)
 
-  };
+  //   console.log('Starting call with:', {
+  //     channelName: generatedChannelName,
+  //     callerId: user?.userdata?.UserID,
+  //     receiverIds,
+  //   });
 
-  const acceptCall = () => {
+  //   socket.emit('callUsers', { channelName: generatedChannelName, callerId, receiverIds: [receiverIds] });
+  // };
+
+  // const acceptCall = () => {
+  //   if (incomingCall) {
+  //     console.log('Call accepted');
+  //     socket.emit('callAccepted', { channelName, callerId: incomingCall });
+  //     // Initiate Agora client connection here
+  //     setIncomingCall(null);
+  //   }
+  // };
+
+  // const rejectCall = () => {
+  //   if (incomingCall) {
+  //     console.log('Call rejected');
+  //     socket.emit('callRejected', { channelName, callerId: incomingCall });
+  //     setIncomingCall(null);
+  //     // Optionally, add logic to notify the caller that the call was rejected
+  //   }
+  // };
+
+   const startCall = () => {
     const generatedChannelName = 'testChannel';
     const callerId = user?.userdata?.UserID;
- 
-    alert(callerId)
-    console.log("user", user)
-    console.log("start call end", receiverIds)
+    const receiverIds = selectedUser?.UserID;
+  // / const receiverIds: any = selectedUser?.UserID;
+     // Replace with actual receiver IDs
 
-    console.log('Starting call with:', {
-      channelName: generatedChannelName,
-      callerId: user?.userdata?.UserID,
-      receiverIds,
-    });
-    if (incomingCall) {
-      console.log('Call accepted');
-      // socket.emit('callAccepted', { channelName, callerId: incomingCall });
-    socket.emit('callUsers', { channelName: generatedChannelName, callerId, receiverIds: [receiverIds] });
-
-      // Initiate Agora client connection here
-      setIncomingCall(null);
-    }
-    setIsCallPopupVisible(false);
+    socket.emit('callUsers', { channelName: generatedChannelName, callerId, receiverIds });
   };
 
-  const rejectCall = () => {
-    
-    if (incomingCall) {
-      console.log('Call rejected');
-      socket.emit('callRejected', { channelName, callerId: incomingCall });
+  const handleCallAccepted = async () => {
+    try {
+      setCallAccepted(true);
+      socket.emit('callAccepted', { channelName, callerId });
+
+      // Start the local audio track
+      const localAudioTrack: IMicrophoneAudioTrack = await rtcClient.createMicrophoneAudioTrack();
+      localAudioTrackRef.current = localAudioTrack;
+      await rtcClient.publish([localAudioTrack]);
+    } catch (error) {
+      console.error('Error accepting the call:', error);
+    }
+  };
+
+  const rejectCall = async () => {
+    try {
+      socket.emit('callRejected', { channelName, callerId });
       setIncomingCall(null);
-      // Optionally, add logic to notify the caller that the call was rejected
+      setCallAccepted(false);
+
+      // Stop and close the local audio track if it exists
+      if (localAudioTrackRef.current) {
+        console.log('Stopping and closing the local audio track');
+        await localAudioTrackRef.current.stop();
+        localAudioTrackRef.current.close();
+        localAudioTrackRef.current = null; // Reset the ref
+      }
+
+      // Leave the RTC channel if joined
+      if (rtcClient) {
+        console.log('Leaving the RTC channel');
+        await rtcClient.leave();
+      }
+
+      console.log('Call rejected successfully');
+    } catch (error) {
+      console.error('Error during call rejection:', error);
     }
   };
 
@@ -272,8 +696,6 @@ const Header: React.FC<HeaderProps> = ({
   console.log("(selectedUser as User).UserID", selectedUser);
   console.log(selectedUser ? groupDetails : "");
   // const { groupname } = groupDetails;
-  console.log("receiverid", user?.userdata?.UserID );
-  console.log("receiverids",receiverIds)
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -284,9 +706,9 @@ const Header: React.FC<HeaderProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                bgcolor: "#dbd5d1",
+                bgcolor: "#064D51",
                 p: 3,
-                height: 65,
+                mt: -8,
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -304,19 +726,30 @@ const Header: React.FC<HeaderProps> = ({
               sx={{ color: "black" }}
               onClick={handleDialogOpen} // Open dialog on click
             /> */}
-
-              <IconButton onClick={() => { startCall() }} sx={{ marginLeft: "0px", color: "#1976d2" }}>
+   <AgoraRTCProvider client={rtcClient}>
+      <div>
+        {/* <h1>Agora One-to-Many Call</h1> */}
+        <IconButton onClick={() => { startCall() }} >
                 <CallIcon />
               </IconButton>
-              <AgoraRTCProvider client={rtcClient}>
-              {isCallPopupVisible && ( user?.userdata?.UserID != receiverIds) && (
-        <CallPopup
-          incomingCall={isCallPopupVisible}
-          caller={selectedUser}
-          onAccept={acceptCall}
-          onReject={rejectCall}
-        />
-      )}
+        {/* <button onClick={startCall}>Start Call</button> */}
+        {incomingCall && (
+          <div>
+            <p>Incoming call from {incomingCall}</p>
+            <button onClick={handleCallAccepted}>Accept Call</button>
+            <button onClick={rejectCall}>Reject</button>
+          </div>
+        )}
+        {callAccepted && channelName && token && (
+          <AgoraClient channelName={channelName} token={token}  />
+        )}
+      </div>
+    </AgoraRTCProvider>
+              {/* <IconButton onClick={() => { startCall() }} sx={{ marginLeft: "0px", color: "#1976d2" }}>
+                <CallIcon />
+              </IconButton>
+              <AgoraRTCProvider client={rtcClient}> */}
+
                 {/* {incomingCall  && selectedUser?.UserID == receiverId? ( */}
                 {/* {incomingCall && selectedUser?.UserID ? (
                   <CallPopup
@@ -330,8 +763,8 @@ const Header: React.FC<HeaderProps> = ({
                   <div></div>
                 )
                 } */}
-                {token && <AgoraClient channelName={channelName} token={token} />}
-              </AgoraRTCProvider>
+                {/* {token && <AgoraClient channelName={channelName} token={token} />}
+              </AgoraRTCProvider> */}
 
               <IconButton
                 sx={{ marginLeft: "auto", color: "#1976d2" }} // Ensure the icon is visible on dark background
