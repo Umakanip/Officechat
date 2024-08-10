@@ -188,7 +188,7 @@ function Header() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar sx={{ marginTop: "1px", color: "white" }}>
           <IconButton
             size="large"
             edge="start"
@@ -204,7 +204,7 @@ function Header() {
             component="div"
             sx={{ display: { xs: "none", sm: "block" } }}
           >
-            Office Chat
+            &nbsp;Clubits Chat
           </Typography>
           <Search>
             <SearchIconWrapper>

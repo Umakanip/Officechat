@@ -1,7 +1,6 @@
 .MuiAppBar-root {
   height: 64px; /* Adjust height if necessary */
 }
-
 .css-1ypv6od-MuiButtonBase-root-MuiListItem-root:hover {
   color: rgb(93 100 173) !important;
 }
@@ -36,5 +35,6 @@
   color: black !important;
 }
 .css-hip9hq-MuiPaper-root-MuiAppBar-root {
-  background-color: #15426eed !important;
+  background-color: #6a5acd !important;
+  color: black !important;
 }
