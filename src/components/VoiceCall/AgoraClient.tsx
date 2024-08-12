@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import AgoraRTC, {
   IAgoraRTCClient,
   IAgoraRTCRemoteUser,
@@ -15,6 +15,7 @@ interface AgoraClientProps {
 const AgoraClient: FC<AgoraClientProps> = ({ channelName, token }) => {
   const appId: string = "1369151da2df4f33bdd842b8c0797085"; // Replace with your actual Agora App ID
   const incomingCallSound = new Audio("/public/teams_default.mp3");
+  const localAudioTrackRef = useRef<IMicrophoneAudioTrack | null>(null);
 
   useEffect(() => {
     const handleIncomingCall = (data: {
@@ -56,6 +57,8 @@ const AgoraClient: FC<AgoraClientProps> = ({ channelName, token }) => {
         const localAudioTrack: IMicrophoneAudioTrack =
           await AgoraRTC.createMicrophoneAudioTrack();
         await client.publish([localAudioTrack]);
+        localAudioTrackRef.current = localAudioTrack;
+
         console.log("Published audio track successfully");
 
         // Subscribe to remote users
@@ -88,6 +91,10 @@ const AgoraClient: FC<AgoraClientProps> = ({ channelName, token }) => {
         client.remoteUsers.forEach((user: IAgoraRTCRemoteUser) => {
           if (user.audioTrack) user.audioTrack.stop();
         });
+        if (localAudioTrackRef.current) {
+          localAudioTrackRef.current.stop();
+          localAudioTrackRef.current = null;
+        }
       };
       leaveChannel();
     };

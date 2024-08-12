@@ -64,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({
   const [searchParams] = useSearchParams();
   const type = searchParams.get("id");
   const [callerId, setCallerId] = useState<string | null>(type);
-  var receiverIds: any = selectedUser?.UserID;
+
   useEffect(() => {
     socket.emit("register", user?.userdata?.UserID);
 
@@ -89,6 +89,10 @@ const Header: React.FC<HeaderProps> = ({
       setIncomingCall(null);
       setChannelName("");
       setToken("");
+      if (localAudioTrackRef.current) {
+        localAudioTrackRef.current.stop();
+        localAudioTrackRef.current = null;
+      }
     });
 
     return () => {
@@ -133,6 +137,12 @@ const Header: React.FC<HeaderProps> = ({
       console.log("Call rejected");
       socket.emit("callRejected", { channelName, callerId: incomingCall });
       setIncomingCall(null);
+      setChannelName("");
+      setToken("");
+      if (localAudioTrackRef.current) {
+        localAudioTrackRef.current.stop();
+        localAudioTrackRef.current = null;
+      }
       // Optionally, add logic to notify the caller that the call was rejected
     }
   };
