@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { MouseEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { MouseEvent, useEffect, useState, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Box,
   IconButton,
@@ -10,6 +10,7 @@ import {
   Button,
   TextField,
 } from "@mui/material";
+
 import { Message, Group, User } from "./messagetypes.ts";
 import GroupIcon from "@mui/icons-material/Group";
 import VideocamIcon from "@mui/icons-material/Videocam";
@@ -17,10 +18,16 @@ import { useUser } from "../../context/UserContext.tsx";
 import io from "socket.io-client";
 import Suggestions from "../Header/Suggestions.tsx";
 import AgoraClient from "../../VoiceCall/AgoraClient.tsx";
+import { AgoraRTCProvider } from "agora-rtc-react";
 import CallIcon from "@mui/icons-material/Call";
 import CallPopup from "../../VoiceCall/CallPopup.tsx";
+import AgoraRTC, {
+  IAgoraRTCClient,
+  IMicrophoneAudioTrack,
+} from "agora-rtc-sdk-ng";
 
 const socket = io("http://localhost:5000");
+const rtcClient: any = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
 interface HeaderProps {
   selectedUser: User;
@@ -51,7 +58,12 @@ const Header: React.FC<HeaderProps> = ({
   // const [searchSuggestions, setSearchSuggestions] = useState<User[]>([]);
   const [suggestionsVisible, setSuggestionsVisible] = useState(false);
   const [incomingCall, setIncomingCall] = useState<string | null>(null);
+  const [callAccepted, setCallAccepted] = useState<boolean>(false);
+  const localAudioTrackRef = useRef<IMicrophoneAudioTrack | null>(null);
   const [isCallPopupVisible, setIsCallPopupVisible] = useState(false);
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("id");
+  const [callerId, setCallerId] = useState<string | null>(type);
   var receiverIds: any = selectedUser?.UserID;
   useEffect(() => {
     socket.emit("register", user?.userdata?.UserID);
@@ -252,6 +264,22 @@ const Header: React.FC<HeaderProps> = ({
     setSuggestions([]);
     setSuggestionsVisible(false);
   };
+
+  const handleCallAccepted = async () => {
+    try {
+      setCallAccepted(true);
+      socket.emit("callAccepted", { channelName, callerId });
+
+      // Start the local audio track
+      const localAudioTrack: IMicrophoneAudioTrack =
+        await rtcClient.createMicrophoneAudioTrack();
+      localAudioTrackRef.current = localAudioTrack;
+      await rtcClient.publish([localAudioTrack]);
+    } catch (error) {
+      console.error("Error accepting the call:", error);
+    }
+  };
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
@@ -292,12 +320,38 @@ const Header: React.FC<HeaderProps> = ({
               onClick={handleDialogOpen} // Open dialog on click
             /> */}
 
-              <IconButton
+              {/* <IconButton
                 onClick={startCall}
                 sx={{ marginLeft: "0px", color: "#1976d2" }}
               >
                 <CallIcon />
-              </IconButton>
+              </IconButton> */}
+
+              <AgoraRTCProvider client={rtcClient}>
+                <div>
+                  {/* <h1>Agora One-to-Many Call</h1> */}
+                  <IconButton onClick={startCall}>
+                    <CallIcon />
+                  </IconButton>
+                  {/* <button onClick={startCall}>Start Call</button> */}
+                  {incomingCall && (
+                    // <div>
+                    //   <p>Incoming call from {incomingCall}</p>
+                    //   <button onClick={handleCallAccepted}>Accept Call</button>
+                    //   <button onClick={rejectCall}>Reject</button>
+                    // </div>
+                    <CallPopup
+                      incomingCall={incomingCall}
+                      caller={selectedUser}
+                      onAccept={handleCallAccepted}
+                      onReject={rejectCall}
+                    />
+                  )}
+                  {callAccepted && channelName && token && (
+                    <AgoraClient channelName={channelName} token={token} />
+                  )}
+                </div>
+              </AgoraRTCProvider>
 
               <IconButton
                 sx={{ marginLeft: "auto", color: "#1976d2" }}
