@@ -706,7 +706,7 @@ const Header: React.FC<HeaderProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                bgcolor: "#064D51",
+                bgcolor: "#dbd5d1",
                 p: 3,
                 height: "65px",
               }}
@@ -717,7 +717,7 @@ const Header: React.FC<HeaderProps> = ({
                   src={ProfilePicture || undefined}
                   sx={{ mr: 2 }}
                 />
-              <Typography variant="h6" sx={{ color: "white !important" }}>
+              <Typography variant="h6" >
                 {UserID ? Username || "User" : GroupName || "Group"}
               </Typography>
               </Box>

@@ -1,14 +1,5 @@
-// GroupChatContent.tsx
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Container,
-} from "@mui/material";
+import React from "react";
+import { Box, Typography, List, ListItem, ListItemText, Container } from "@mui/material";
 import { Message } from "./messagetypes";
 
 interface GroupChatContentProps {
@@ -20,7 +11,6 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
   userDetails,
   messageList,
 }) => {
-  console.log("messageList", messageList);
   return (
     <Container
       maxWidth="sm"
@@ -29,41 +19,49 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {messageList && messageList.length > 0 ? (
           <List>
-            {messageList.map((messageContent, index) => (
-              <ListItem
-                key={index}
-                alignItems="flex-start"
-                style={{
-                  backgroundColor:
-                    userDetails.Username === messageContent.author
-                      ? "#e1ffc7"
-                      : "#f1f0f0",
-                  margin: "10px 0",
-                }}
-              >
-                <ListItemText
-                  primary={messageContent.Content}
-                  secondary={
-                    <>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        color="text.primary"
-                      >
-                        {userDetails.Username === messageContent.author
-                          ? "You"
-                          : "Other"}
-                      </Typography>
-                      {" — " + messageContent.SentAt}
-                    </>
-                  }
-                />
-              </ListItem>
-            ))}
+            {messageList.map((messageContent, index) => {
+              const isSender = userDetails.Username === messageContent.author;
+              return (
+                <ListItem
+                  key={index}
+                  style={{
+                    display: "flex",
+                    justifyContent: isSender ? "flex-end" : "flex-start",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      maxWidth: "60%",
+                      padding: "0.75rem",
+                      borderRadius: "10px",
+                      backgroundColor: isSender ? "#e1ffc7" : "#f1f0f0",
+                      boxShadow: 2,
+                      alignSelf: isSender ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    <ListItemText
+                      primary={messageContent.Content}
+                      secondary={
+                        <>
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            {isSender ? "You" : messageContent.author}
+                          </Typography>
+                          {" — " + messageContent.SentAt}
+                        </>
+                      }
+                    />
+                  </Box>
+                </ListItem>
+              );
+            })}
           </List>
         ) : (
           <Box>
-            <h1>There is no conversation in this groups</h1>
+            <h1>There is no conversation in this group</h1>
           </Box>
         )}
       </Box>
