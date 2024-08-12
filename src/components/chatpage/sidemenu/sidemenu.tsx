@@ -11,8 +11,13 @@ import {
   CssBaseline,
   Divider,
   Icon,
+  TextField, 
+  Button,
+  IconButton
 } from "@mui/material";
 import "./SideMenu.css";
+import ChatIcon from '@mui/icons-material/Chat';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ContactList from "../chatlist/ContactList.tsx";
 import ChatArea from "../ChatWindow/ChaArea.tsx";
 import { useUser } from "../../context/UserContext.tsx";
@@ -26,62 +31,28 @@ interface Item {
   GroupID: number | null;
 }
 
-const ActivityContent = ({
-  selectedItem,
-  onSelect,
-}: {
-  selectedItem: Item | null;
-  onSelect: (item: Item) => void;
-}) => {
-  const customers: Item[] = [
-    {
-      id: 1,
-      Username: "Customer 1",
-      details: "Details about Customer 1",
-      ProfilePicture: undefined,
-      UserID: null,
-      GroupID: null,
-    },
-    {
-      id: 2,
-      Username: "Customer 2",
-      details: "Details about Customer 2",
-      ProfilePicture: undefined,
-      UserID: null,
-      GroupID: null,
-    },
-    {
-      id: 3,
-      Username: "Customer 3",
-      details: "Details about Customer 3",
-      ProfilePicture: undefined,
-      UserID: null,
-      GroupID: null,
-    },
-  ];
-
+const ActivityContent = () => {
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="h5">Active Users</Typography>
-        <List>
-          {customers.map((customer) => (
-            <ListItem
-              button
-              key={customer.id}
-              onClick={() => onSelect(customer)}
-            >
-              <ListItemText primary={customer.Username} />
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-      {selectedItem && (
-        <Box sx={{ flex: 2, ml: 3 }}>
-          <Typography variant="h6">{selectedItem.Username}</Typography>
-          <Typography>{selectedItem.details}</Typography>
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", p: 3 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: "bolder" }}>
+        Stay in Touch using Chat
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 18, width: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", border: "0.5px solid #d3d4d9", borderRadius: "10px", height: "450px" }}>
+          <img src="chat.jpg" alt="Form 1" style={{ height: "300px", padding: "20px" }} />
+          <p style={{ fontSize: "20px", fontWeight: "bold" }}>Start chatting</p>
+          <IconButton sx={{ fontSize: "15px", color: "#006FFC", cursor: 'no-drop', }}>
+          <ChatIcon sx={{ fontSize: "20px" }} />&nbsp;<a href="#" style={{ color: '#006FFC', cursor: 'no-drop', textDecoration: "none" }}>New chat</a>
+          </IconButton>
         </Box>
-      )}
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", border: "0.5px solid #d3d4d9", borderRadius: "10px" }}>
+          <img src="invite.jpg" alt="Form 2" style={{ height: "300px", width: "300px", padding: "20px" }} />
+          <p style={{ fontSize: "20px", fontWeight: "bold" }}>Invite people you know</p>
+          <IconButton sx={{ fontSize: "15px", color: "#006FFC", cursor: 'no-drop', }}> 
+          <PersonAddIcon sx={{ fontSize: "20px" }} />&nbsp;<a href="#" style={{ color: '#006FFC', cursor: 'no-drop', textDecoration: "none" }}>Invite to Teams</a>
+          </IconButton>
+        </Box>
+      </Box>
     </Box>
   );
 };
