@@ -122,8 +122,8 @@ import { User } from "../chatpage/ChatWindow/messagetypes";
 import { useUser } from "../context/UserContext.tsx";
 
 interface CallPopupProps {
-  incomingCall: string | null;
-  caller: User | null;
+  incomingCall: string;
+  caller: any;
   onAccept: () => void;
   onReject: () => void;
 }
@@ -147,7 +147,7 @@ const CallPopup: React.FC<CallPopupProps> = ({
       </div>
       <DialogActions>
         <Button onClick={onReject} color="error">
-          <PhoneDisabledIcon /> Reject
+          <CallIcon /> Reject
         </Button>
         <Button onClick={onAccept} color="primary">
           <CallIcon /> Accept
