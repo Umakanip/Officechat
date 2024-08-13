@@ -34,7 +34,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                 key={index}
                 style={{
                   display: "flex",
-                  justifyContent: isSender ? "flex-end" : "flex-start",
+                  justifyContent: isSender ? "flex-start" : "flex-end", // Swap sides
                   padding: "0px", // Remove default padding to align properly
                 }}
               >
@@ -43,9 +43,9 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                     maxWidth: "60%",
                     padding: "0.75rem",
                     borderRadius: "10px",
-                    backgroundColor: isSender ? "#e1ffc7" : "#f1f0f0",
+                    backgroundColor: isSender ? "#f1f0f0" : "#e1ffc7", // Swap colors
                     boxShadow: 2,
-                    textAlign: isSender ? "right" : "left",
+                    textAlign: isSender ? "left" : "right", // Swap text alignment
                     margin: "5px", // Add margin for spacing between messages
                   }}
                 >
