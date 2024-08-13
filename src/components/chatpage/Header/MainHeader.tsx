@@ -64,8 +64,11 @@ function Header() {
     selectedUserId,
     user,
     setActiveGroup,
+    activeUser,
     setActiveUser,
     setSelectedUserId,
+    selectActiveUser,
+    setselectActiveUser,
   } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<User[]>([]);
@@ -92,10 +95,12 @@ function Header() {
   };
 
   const handleSelectUser = (user: User) => {
-    console.log("User selected:", user.Username);
+    console.log("User selected:", typeof user.UserID);
+
     setSearchTerm(user.Username);
     setActiveGroup(null); // Clear active group
     setActiveUser(user.UserID); // Set the selected user as active
+    setselectActiveUser(user);
     setSelectedUserId(user.UserID);
     setSearchSuggestions([]);
     setSuggestionsVisible(false);
@@ -197,6 +202,7 @@ function Header() {
         >
           <AccountCircle />
         </IconButton>
+
         <p>Profile</p>
       </MenuItem>
     </Menu>
@@ -243,6 +249,10 @@ function Header() {
 
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Typography style={{ marginTop: "10px" }}>
+              {user?.userdata?.Username}
+            </Typography>
+
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -253,6 +263,7 @@ function Header() {
             >
               <AccountCircle />
             </IconButton>
+
             <IconButton
               size="large"
               edge="end"

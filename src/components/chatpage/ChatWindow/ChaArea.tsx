@@ -15,10 +15,43 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [headerTitle, setHeaderTitle] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const { activeGroup, setActiveGroup, setGroups, activeUser, setActiveUser } =
-    useUser();
+  const {
+    activeGroup,
+    setActiveGroup,
+    setGroups,
+    activeUser,
+    setActiveUser,
+    selectActiveUser,
+    setselectActiveUser,
+  } = useUser();
 
   useEffect(() => {
+    console.log("activeUser", selectActiveUser);
+    // Update selectedUser based on activeUser or selectedUserId
+    if (selectActiveUser) {
+      setSelectedUser(selectActiveUser);
+      setHeaderTitle(selectActiveUser.Username || "User");
+    } else if (activeUser) {
+      // Fetch user details by ID and set selectedUser
+      const fetchUserDetails = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:3000/api/users/${activeUser}`
+          );
+          setSelectedUser(response.data);
+          setHeaderTitle(response.data.Username || "User");
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+        }
+      };
+      fetchUserDetails();
+    }
+  }, [selectActiveUser, activeUser]);
+
+  useEffect(() => {
+    console.log("active users list");
+    console.log(activeUser);
+    console.log(selectActiveUser);
     // Fetch messages based on selectedUser or activeGroup
     const fetchMessages = async () => {
       try {
@@ -29,7 +62,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           );
         } else if (activeUser) {
           response = await axios.get(
-            `http://localhost:3000/api/messages/${userDetails.UserID}`
+            `http://localhost:3000/api/messages/${activeUser}`
           );
         } else {
           // Handle case where neither group nor single chat is selected

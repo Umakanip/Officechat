@@ -1,5 +1,12 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 import axios from "axios";
+import { User } from "../chatpage/ChatWindow/messagetypes";
 
 interface UserDetails {
   userdata: any;
@@ -25,6 +32,8 @@ interface UserContextProps {
   selectedUserId: number | null;
   setSelectedUserId: (userId: number | null) => void;
   logout: () => void;
+  selectActiveUser: User | null;
+  setselectActiveUser: (user: User) => void;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -37,11 +46,29 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [activeGroup, setActiveGroup] = useState<number | null>(null);
   const [activeUser, setActiveUser] = useState<number | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectActiveUser, setselectActiveUser] = useState<User | null>(null);
   const logout = () => {
     setUser(null);
     // Optionally, perform additional cleanup (e.g., clear tokens)
     // e.g., localStorage.removeItem('userToken');
   };
+  useEffect(() => {
+    // Retrieve user data from localStorage on initial load
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save user data to localStorage whenever it changes
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
+
   return (
     <UserContext.Provider
       value={{
@@ -56,6 +83,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         selectedUserId,
         setSelectedUserId,
         logout,
+        selectActiveUser,
+        setselectActiveUser,
       }}
     >
       {children}

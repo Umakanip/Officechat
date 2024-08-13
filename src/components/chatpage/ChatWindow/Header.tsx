@@ -51,6 +51,7 @@ const Header: React.FC<HeaderProps> = ({
     activeGroup,
     setActiveGroup,
     setActiveUser,
+    setselectActiveUser,
     user,
   } = useUser();
   const [channelName, setChannelName] = useState<string>("");
@@ -66,6 +67,7 @@ const Header: React.FC<HeaderProps> = ({
   const [callerId, setCallerId] = useState<string | null>(type);
 
   useEffect(() => {
+    console.log("user?.userdata?.UserID", user?.userdata?.UserID);
     socket.emit("register", user?.userdata?.UserID);
 
     socket.on(
@@ -224,6 +226,7 @@ const Header: React.FC<HeaderProps> = ({
       setGroups((prevGroups) => [newGroup, ...prevGroups]);
       setActiveGroup(response.data.GroupID);
       setActiveUser(null);
+      setselectActiveUser(null);
       // Update the selectedUser with the new group information if needed
       onGroupCreate(newGroup); // Pass the new group information
       setQuery(""); // Clear the input
