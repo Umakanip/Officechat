@@ -201,9 +201,9 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
           flexGrow: 1,
           overflow: "auto",
           height: "250px",
-          '&::-webkit-scrollbar': {
-            width: '1px',  
-          },
+          // '&::-webkit-scrollbar': {
+          //   width: '1px',
+          // },
         }}
       >
         {" "}

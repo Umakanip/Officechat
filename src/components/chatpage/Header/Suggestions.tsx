@@ -36,7 +36,9 @@ const Suggestions: React.FC<SuggestionsProps> = ({ suggestions, onSelect }) => {
                   onClick={() => onSelect(user)}
                   key={user.UserID}
                 >
-                  <Typography variant="body2">{user.Username}</Typography>
+                  <Typography variant="body2" style={{ color: "black" }}>
+                    {user.Username}
+                  </Typography>
                 </ListItem>
               </>
             );

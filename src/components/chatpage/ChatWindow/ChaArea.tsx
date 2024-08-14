@@ -61,6 +61,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/groupmessages?groupid=${selectedUser.GroupID}`
           );
         } else if (activeUser) {
+          console.log("Else if", activeUser);
           response = await axios.get(
             `http://localhost:3000/api/messages/${activeUser}`
           );
@@ -68,10 +69,25 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           // Handle case where neither group nor single chat is selected
           return;
         }
-        console.log("Fiel", response.data);
-        setMessageList(response.data);
+        if (response.data.error) {
+          console.log("No messages found:", response.data.error);
+          setMessageList([]); // Or display a 'No messages found' message in the UI
+        } else {
+          console.log("Messages:", response.data);
+          setMessageList(response.data);
+        }
       } catch (error) {
-        console.error("Error fetching messages:", error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          console.log("Error from server:", error.response.data.error);
+          setMessageList([]); // Or display an error message in the UI
+        } else {
+          console.error("Error fetching messages:", error);
+          setMessageList([]); // Or display an error message in the UI
+        }
       }
     };
 

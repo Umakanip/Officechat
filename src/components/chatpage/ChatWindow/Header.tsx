@@ -72,24 +72,29 @@ const Header: React.FC<HeaderProps> = ({
 
     socket.on(
       "incomingCall",
-      async (data: { channelName: string; token: string; callerId: string }) => {
+      async (data: {
+        channelName: string;
+        token: string;
+        callerId: string;
+      }) => {
         setChannelName(data.channelName);
         setToken(data.token);
         setIncomingCall(data.callerId);
-    console.log("callertest",data.callerId)
+        console.log("callertest", data.callerId);
         try {
-          const response = await axios.get(`http://localhost:3000/api/users/${data.callerId}`);
+          const response = await axios.get(
+            `http://localhost:3000/api/users/${data.callerId}`
+          );
           console.log("Caller data:", response.data);
           var callerdetail = response.data.callerdetail;
-          setCaller(callerdetail); 
+          // setCaller(callerdetail);
         } catch (error) {
           console.error("Error fetching caller details:", error);
         }
-    
+
         console.log("Incoming call data", data);
       }
     );
-    
 
     socket.on("callAccepted", ({ channelName, callerId }) => {
       console.log(`Call accepted by ${callerId}`);
@@ -257,7 +262,7 @@ const Header: React.FC<HeaderProps> = ({
   const handleAddUser = async () => {
     try {
       const response = await axios.post(
-       ` http://localhost:3000/api/addUsers?`,
+        ` http://localhost:3000/api/addUsers?`,
         {
           // Email: groupEmail,
           GroupID: GroupID,
@@ -306,9 +311,9 @@ const Header: React.FC<HeaderProps> = ({
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
-  console.log("username", user?.userdata?.Username)
-  console.log("userid", user?.userdata?.UserID)
-
+  console.log("username", user?.userdata?.Username);
+  console.log("userid", user?.userdata?.UserID);
+  console.log("selectedUser", selectedUser);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -359,12 +364,11 @@ const Header: React.FC<HeaderProps> = ({
                   </IconButton>
                   {incomingCall && (
                     <CallPopup
-                    incomingCall={incomingCall}
-                    caller={caller} // Ensure caller is of type User | null
-                    onAccept={handleCallAccepted}
-                    onReject={rejectCall}
-                  />
-                  
+                      incomingCall={incomingCall}
+                      caller={caller} // Ensure caller is of type User | null
+                      onAccept={handleCallAccepted}
+                      onReject={rejectCall}
+                    />
                   )}
 
                   {callAccepted && channelName && token && (
