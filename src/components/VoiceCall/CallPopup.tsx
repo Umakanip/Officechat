@@ -25,8 +25,8 @@
 //   onReject,
 // }) => {
 //   console.log("caller",caller)
-//   const callerDisplay = typeof caller === 'string' 
-//     ? caller  
+//   const callerDisplay = typeof caller === 'string'
+//     ? caller
 //     : 'Unknown';
 //   return (
 //     <Dialog open={!!incomingCall} onClose={onReject}>
@@ -63,7 +63,6 @@
 // import PhoneDisabledIcon from "@mui/icons-material/PhoneDisabled";
 // import { User } from "../chatpage/ChatWindow/messagetypes";
 // import { useUser } from "../context/UserContext.tsx";
-
 
 // interface CallPopupProps {
 //   incomingCall: string | null;
@@ -134,7 +133,7 @@ const CallPopup: React.FC<CallPopupProps> = ({
   onAccept,
   onReject,
 }) => {
-  console.log("caller",caller)
+  console.log("caller", caller);
   const callerDisplay = caller?.Username || "Unknown";
 
   return (
@@ -158,7 +157,6 @@ const CallPopup: React.FC<CallPopupProps> = ({
 };
 
 export default CallPopup;
-
 
 // import React from "react";
 // import {
