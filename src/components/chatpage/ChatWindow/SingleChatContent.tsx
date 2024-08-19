@@ -38,6 +38,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
 
   useEffect(() => {
     console.log("messageList", messageList);
+    console.log(messageList.length);
   }, [messageList]);
 
   const handleOpen = (filename: string) => {
@@ -65,34 +66,96 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
       style={{ height: "100vh", display: "flex", flexDirection: "column" }}
     >
       <Box sx={{ flex: 1, overflow: "auto" }}>
-        {messageList.length > 0 ? (
-          <List>
-            {messageList.map((messageContent, index) => {
-              const isSender = userDetails.UserID === messageContent.SenderID;
-              const isImage = isImageUrl(messageContent.Content);
+        {/* {messageList.length > 0 ? ( */}
+        <List>
+          {messageList.map((messageContent, index) => {
+            const isSender = userDetails.UserID === messageContent.SenderID;
+            const isImage = isImageUrl(messageContent.Content);
 
-              const renderFilePreview = () => {
-                if (!messageContent.file) return null;
+            const renderFilePreview = () => {
+              if (!messageContent.file) return null;
 
-                const { filetype, url, filename } = messageContent.file;
-                let preview;
+              const { filetype, url, filename } = messageContent.file;
+              let preview;
 
-                if (filetype?.startsWith("image/")) {
-                  preview = (
-                    <Link onClick={() => handleOpen(filename)} to="#">
-                      {filename}
-                    </Link>
-                  );
-                } else if (filetype?.startsWith("video/")) {
-                  preview = (
-                    <video controls src={url} style={{ maxWidth: "200px" }} />
-                  );
-                } else if (filetype?.startsWith("audio/")) {
-                  preview = <audio controls src={url} />;
-                } else {
-                  preview = (
+              if (filetype?.startsWith("image/")) {
+                preview = (
+                  <Link onClick={() => handleOpen(filename)} to="#">
+                    {filename}
+                  </Link>
+                );
+              } else if (filetype?.startsWith("video/")) {
+                preview = (
+                  <video controls src={url} style={{ maxWidth: "200px" }} />
+                );
+              } else if (filetype?.startsWith("audio/")) {
+                preview = <audio controls src={url} />;
+              } else {
+                preview = (
+                  <ListItemText
+                    primary={messageContent.Content}
+                    secondary={
+                      <>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          color="text.primary"
+                        ></Typography>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontSize: "0.75rem", marginLeft: 5 }}
+                        >
+                          {formatTime(messageContent.SentAt)}
+                        </Typography>
+                      </>
+                    }
+                  />
+                );
+              }
+
+              return <div style={{ marginTop: "10px" }}>{preview}</div>;
+            };
+
+            return (
+              <ListItem
+                key={index}
+                style={{
+                  display: "flex",
+                  justifyContent: isSender ? "flex-end" : "flex-start",
+                  padding: "0px",
+                }}
+              >
+                <Box
+                  sx={{
+                    maxWidth: "60%",
+                    padding: "0.75rem",
+                    borderRadius: "10px",
+                    backgroundColor: isSender ? "#f1f0f0" : "#e1ffc7",
+                    boxShadow: 2,
+                    textAlign: isSender ? "left" : "left",
+                    margin: "5px",
+                  }}
+                >
+                  {messageContent.file ? (
+                    <ListItemText>{renderFilePreview()}</ListItemText>
+                  ) : (
                     <ListItemText
-                      primary={messageContent.Content}
+                      primary={
+                        isImage ? (
+                          <Link
+                            onClick={() => handleOpen(messageContent.Content)}
+                            to="#"
+                          >
+                            <Typography variant="body2" color="text.primary">
+                              {messageContent.Content}
+                            </Typography>
+                          </Link>
+                        ) : (
+                          messageContent.Content
+                        )
+                      }
                       secondary={
                         <>
                           <Typography
@@ -111,79 +174,17 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                         </>
                       }
                     />
-                  );
-                }
-
-                return <div style={{ marginTop: "10px" }}>{preview}</div>;
-              };
-
-              return (
-                <ListItem
-                  key={index}
-                  style={{
-                    display: "flex",
-                    justifyContent: isSender ? "flex-end" : "flex-start",
-                    padding: "0px",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      maxWidth: "60%",
-                      padding: "0.75rem",
-                      borderRadius: "10px",
-                      backgroundColor: isSender ? "#f1f0f0" : "#e1ffc7",
-                      boxShadow: 2,
-                      textAlign: isSender ? "left" : "left",
-                      margin: "5px",
-                    }}
-                  >
-                    {messageContent.file ? (
-                      <ListItemText>{renderFilePreview()}</ListItemText>
-                    ) : (
-                      <ListItemText
-                        primary={
-                          isImage ? (
-                            <Link
-                              onClick={() => handleOpen(messageContent.Content)}
-                              to="#"
-                            >
-                              <Typography variant="body2" color="text.primary">
-                                {messageContent.Content}
-                              </Typography>
-                            </Link>
-                          ) : (
-                            messageContent.Content
-                          )
-                        }
-                        secondary={
-                          <>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.primary"
-                            ></Typography>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{ fontSize: "0.75rem", marginLeft: 5 }}
-                            >
-                              {formatTime(messageContent.SentAt)}
-                            </Typography>
-                          </>
-                        }
-                      />
-                    )}
-                  </Box>
-                </ListItem>
-              );
-            })}
-          </List>
-        ) : (
-          <Box>
-            <h1>There is no conversation in this Chat</h1>
-          </Box>
-        )}
+                  )}
+                </Box>
+              </ListItem>
+            );
+          })}
+        </List>
+        {/* // ) : (
+        //   <Box>
+        //     <h1>There is no conversation in this Chat</h1>
+        //   </Box>
+        // )} */}
       </Box>
 
       <Modal
