@@ -69,6 +69,8 @@ function Header() {
     setSelectedUserId,
     selectActiveUser,
     setselectActiveUser,
+    contacts,
+    setContacts, // Assuming you have a state or function to manage contacts
   } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<User[]>([]);
@@ -104,6 +106,15 @@ function Header() {
     setSelectedUserId(user.UserID);
     setSearchSuggestions([]);
     setSuggestionsVisible(false);
+
+    // Add the user to contacts if not already present
+    const userInContacts = contacts.find(
+      (contact) => contact.UserID === user.UserID
+    );
+
+    if (!userInContacts) {
+      setContacts((prevContacts) => [...prevContacts, user]);
+    }
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,6 +219,41 @@ function Header() {
     </Menu>
   );
 
+  const handleSendMessage = async (message: string) => {
+    try {
+      const response = await axios.post("http://localhost:3000/api/messages", {
+        userId: activeUser,
+        message,
+      });
+  
+      if (response.status === 200) {
+        console.log("Message sent successfully.");
+  
+        // Check if the user is already in the contacts list
+        const userInContacts = contacts.find(
+          (contact) => contact.UserID === activeUser
+        );
+  
+        if (!userInContacts) {
+          // Ensure selectActiveUser contains necessary fields
+          if (selectActiveUser) {
+            console.log("Adding new user to contacts:", selectActiveUser);
+            setContacts((prevContacts) => [...prevContacts, selectActiveUser]);
+          } else {
+            console.error("selectActiveUser is undefined or empty");
+          }
+        } else {
+          console.log("User already in contacts.");
+        }
+      } else {
+        console.error("Failed to send message, response status:", response.status);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+  
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -263,35 +309,25 @@ function Header() {
             >
               <AccountCircle />
             </IconButton>
-
-            <IconButton
-              size="large"
-              edge="end"
-              aria-haspopup="true"
-              color="inherit"
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      {renderMobileMenu}
-      {renderMenu}
-    </Box>
-  );
+            </Box>
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+        <IconButton
+          size="large"
+          aria-label="show more"
+          aria-controls={mobileMenuId}
+          aria-haspopup="true"
+          onClick={handleMobileMenuOpen}
+          color="inherit"
+        >
+          <MoreIcon />
+        </IconButton>
+      </Box>
+    </Toolbar>
+  </AppBar>
+  {renderMobileMenu}
+  {renderMenu}
+</Box>
+);
 }
 
 export default Header;
