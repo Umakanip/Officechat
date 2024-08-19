@@ -48,38 +48,10 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
   useEffect(() => {
     console.log("groupsgroups", activeGroup);
 
-    // axios
-    //   // .get("http://localhost:3000/api/users")
-    //   .get(`http://localhost:3000/api/getUserStatus/${user?.userdata?.UserID}`)
-    //   .then((response) => {
-    //     console.log("Session handling", response.data);
-    //     setUsersStatus((prev) =>
-    //       new Map(prev).set(user?.userdata?.UserID, response.data.isActive)
-    //     );
-    //     console.log("setUsersStatus", setUsersStatus);
-    //   })
-    //   .catch((error) => {
-    //     setError(error.message);
-    //   });
-
     axios
-      .get("http://localhost:3000/api/users")
+      .get(`http://localhost:3000/api/users/${user?.userdata?.UserID}`)
       .then((response) => {
         const users = response.data;
-        // Create a map of user statuses
-        // const statusMap = new Map<number, boolean>();
-
-        // users.forEach((user: { UserID: number }) => {
-        //   axios
-        //     .get(`http://localhost:3000/api/getUserStatus/${user.UserID}`)
-        //     .then((statusResponse) => {
-        //       statusMap.set(user.UserID, statusResponse.data.isActive);
-        //       setUsersStatus(new Map(statusMap)); // Update status map
-        //     })
-        //     .catch((error) => {
-        //       console.error("Error fetching user status:", error);
-        //     });
-        // });
         console.log(users.length);
 
         setContact(response.data);
@@ -105,16 +77,6 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
       .catch((error) => {
         setError(error.message);
       });
-
-    // socket.on("userStatusUpdate", (userStatus) => {
-    //   setUsersStatus((prevUsers) =>
-    //     prevUsers.map((user) =>
-    //       user.UserID === userStatus.UserID
-    //         ? { ...user, Status: userStatus.isActive }
-    //         : user
-    //     )
-    //   );
-    // });
 
     return () => {
       socket.off("userStatusUpdate");
@@ -142,24 +104,6 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
     }));
     setContact(updatedArray);
   }, [loggedInUsers]);
-
-  // useEffect(() => {
-  //   const handleVisibilityChange = () => {
-  //     console.log(loggedInUsers);
-  //     const updatedArray = Contact.map((item) => ({
-  //       ...item,
-  //       isActive: loggedInUsers.includes(item.UserID) ? true : false,
-  //     }));
-  //     setContact(updatedArray);
-  //   };
-
-  //   document.addEventListener("visibilitychange", handleVisibilityChange);
-
-  //   return () =>
-  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
-  // }, [loggedInUsers]);
-
-  // console.log("Group", groups);
 
   const handleContactClick = (userid: number) => {
     console.log(userid);

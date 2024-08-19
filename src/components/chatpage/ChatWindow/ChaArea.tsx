@@ -6,6 +6,7 @@ import ChatComponent from "./RenderChatComponent.tsx";
 import { Message, User } from "./messagetypes.ts";
 import axios from "axios";
 import { useUser } from "../../context/UserContext.tsx";
+import _ from "lodash"; // Import lodash for debouncing
 
 interface ChatAreaProps {
   userDetails: User; // Adjust type if needed
@@ -31,7 +32,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     console.log("activeUser", selectActiveUser);
     if (selectActiveUser) {
       setSelectedUser(selectActiveUser);
-      setHeaderTitle(selectActiveUser.Username || "User");
+      setHeaderTitle(selectActiveUser.Username);
     } else if (activeUser) {
       const fetchUserDetails = async () => {
         try {
@@ -39,7 +40,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/users/${activeUser}`
           );
           setSelectedUser(response.data);
-          setHeaderTitle(response.data.Username || "User");
+          setHeaderTitle(response.data.Username);
         } catch (error) {
           console.error("Error fetching user details:", error);
         }
@@ -49,6 +50,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   }, [selectActiveUser, activeUser]);
 
   useEffect(() => {
+    console.log("activeUser", selectActiveUser);
+
     const fetchMessages = async () => {
       setLoading(true); // Start loading before fetching messages
       try {
@@ -58,6 +61,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/groupmessages?groupid=${selectedUser.GroupID}`
           );
         } else if (activeUser) {
+          console.log("else if");
           response = await axios.get(
             `http://localhost:3000/api/messages/${activeUser}`
           );
@@ -78,9 +82,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
         setLoading(false); // Stop loading after fetching messages
       }
     };
+    // }, 300);
 
     fetchMessages();
-  }, [selectedUser, activeUser, activeGroup]);
+    // Clean up the debounce on component unmount
+    // return () => {
+    //   fetchMessages.cancel();
+    // };
+  }, [selectedUser?.GroupID, activeUser, activeGroup]);
 
   const handleGroupCreate = (newGroup: User) => {
     console.log("Groupdata", newGroup);
@@ -93,20 +102,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     setMessageList([]);
   };
 
-  useEffect(() => {
-    if (userDetails) {
-      setSelectedUser(userDetails);
-      setHeaderTitle(userDetails.GroupName || userDetails.Username || "Chat");
-      setMessageList([]);
-    }
-  }, [userDetails]);
+  // useEffect(() => {
+  //   if (userDetails) {
+  //     // setSelectedUser(userDetails);
+  //     setHeaderTitle(userDetails.GroupName || userDetails.Username);
+  //     setMessageList([]);
+  //   }
+  // }, [userDetails]);
 
-  useEffect(() => {
-    if (selectedUser) {
-      setHeaderTitle(selectedUser.Username || "User");
-    }
-  }, [selectedUser]);
-
+  // useEffect(() => {
+  //   if (selectedUser) {
+  //     setHeaderTitle(selectedUser.Username);
+  //   }
+  // }, [selectedUser]);
+  console.log("SELECTUSER", selectedUser);
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
@@ -135,120 +144,3 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
 };
 
 export default ChatArea;
-
-// import React, { useState, useEffect } from "react";
-// import { Box, Typography } from "@mui/material";
-// import Footer from "./Footer.tsx";
-// import Header from "./Header.tsx";
-// import ChatComponent from "./RenderChatComponent.tsx";
-// import { Message, User } from "./messagetypes.ts";
-// import axios from "axios";
-// import { useUser } from "../../context/UserContext.tsx";
-
-// interface ChatAreaProps {
-//   userDetails: any;
-// }
-
-// const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
-//   const [messageList, setMessageList] = useState<Message[]>([]);
-//   const [headerTitle, setHeaderTitle] = useState<string>("");
-//   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-//   const { activeGroup, setActiveGroup, setGroups, activeUser, setActiveUser } =
-//     useUser();
-
-//   useEffect(() => {
-//     console.log("ActiveGroup:", userDetails.GroupID);
-//     const fetchMessages = async () => {
-//       try {
-//         let response;
-//         if (userDetails.GroupID) {
-//           response = await axios.get(
-//             `http://localhost:3000/api/groupmessages?groupid=${userDetails.GroupID}`
-//           );
-//         } else if (activeUser) {
-//           response = await axios.get(
-//             `http://localhost:3000/api/messages/${userDetails.UserID}`
-//           );
-//         } else {
-//           // Handle case where neither group nor single chat is selected
-//           return;
-//         }
-//         setMessageList(response.data);
-//       } catch (error) {
-//         console.error("Error fetching messages:", error);
-//       }
-//     };
-
-//     fetchMessages();
-//   }, [activeGroup, activeUser]);
-
-//   const handleGroupCreate = (newGroup: any) => {
-//     console.log("Groupdata", newGroup);
-//     setSelectedUser({
-//       // Assuming you want to update or set selectedUser with new group data
-//       ...newGroup,
-//       GroupID: newGroup.GroupID,
-//       GroupName: newGroup.GroupName,
-//       // Add other necessary properties or update selectedUser based on your requirements
-//     });
-//     setHeaderTitle(newGroup); // Update header title with group email
-//     setMessageList([]); // Clear messages for new group
-//   };
-//   console.log("Active User", activeUser);
-//   console.log("Active Group", activeGroup);
-//   return (
-//     <>
-//       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
-//         {userDetails?.UserID && (
-//           <>
-//             <Header
-//               headerTitle={headerTitle}
-//               selectedUser={userDetails}
-//               onGroupCreate={handleGroupCreate}
-//             />
-
-//             <ChatComponent
-//               userDetails={userDetails}
-//               messageList={messageList}
-//             />
-//           </>
-//         )}
-//         {userDetails?.GroupID || activeGroup ? (
-//           <>
-//             <Header
-//               headerTitle={headerTitle}
-//               selectedUser={selectedUser || userDetails}
-//               onGroupCreate={handleGroupCreate}
-//             />
-//             {/* <Box
-//               sx={{
-//                 flexGrow: 1,
-
-//                 overflow: "hidden",
-//               }}
-//             > */}
-//             <ChatComponent
-//               userDetails={selectedUser || userDetails}
-//               messageList={messageList}
-//             />
-//             {/* </Box> */}
-//           </>
-//         ) : (
-//           <Box
-//             sx={{
-//               display: "flex",
-//               alignItems: "center",
-//               justifyContent: "center",
-//               height: "100%",
-//             }}
-//           >
-//             <Typography variant="h5"></Typography>
-//           </Box>
-//         )}
-//         <Footer userDetails={userDetails} setMessageList={setMessageList} />
-//       </Box>
-//     </>
-//   );
-// };
-
-// export default ChatArea;
