@@ -163,7 +163,6 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const startCall = async () => {
-    setIsCallPopupVisible(true);
     if (!selectedUser) return; // Handle case where selectedUser might be null
 
     const generatedChannelName = "testChannel";
@@ -181,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({
       callerId,
       receiverIds: [receiverId],
     });
-    setIsCallPopupVisible(true);
+
     try {
       const callData = {
         CallerID: user?.userdata?.UserID as number,
@@ -213,7 +212,7 @@ const Header: React.FC<HeaderProps> = ({
     startCallTimer();
     try {
       setCallAccepted(true);
-
+      setIsCallPopupVisible(false);
       socket.emit("callAccepted", { channelName, callerId: incomingCall });
 
       // Start the local audio track
@@ -221,7 +220,7 @@ const Header: React.FC<HeaderProps> = ({
         await rtcClient.createMicrophoneAudioTrack();
       localAudioTrackRef.current = localAudioTrack;
       await rtcClient.publish([localAudioTrack]);
-      setIsCallPopupVisible(false);
+
       // Start the call duration timer
       // setCallDuration(0); // Reset the timer
       // callTimerRef.current = setInterval(() => {
@@ -237,7 +236,6 @@ const Header: React.FC<HeaderProps> = ({
       console.log("Call rejected");
       socket.emit("callRejected", { channelName, callerId: incomingCall });
       setIncomingCall(null);
-      setIsCallPopupVisible(false);
       setChannelName("");
       setToken("");
       if (localAudioTrackRef.current) {
@@ -433,11 +431,6 @@ const Header: React.FC<HeaderProps> = ({
       // Handle the error, e.g., show a notification
     }
   };
-  useEffect(() => {
-    if (incomingCall || !isCallPopupVisible) {
-      setIsCallPopupVisible(true);
-    }
-  }, [incomingCall, isCallPopupVisible]);
 
   const handleOpenModal = (
     actionType: "delete" | "leave",
@@ -499,15 +492,14 @@ const Header: React.FC<HeaderProps> = ({
                     <CallIcon />
                   </IconButton>
 
-                  {incomingCall ||
-                    (isCallPopupVisible && (
-                      <CallPopup
-                        incomingCall={incomingCall}
-                        caller={callerdetail}
-                        onAccept={handleCallAccepted}
-                        onReject={rejectCall}
-                      />
-                    ))}
+                  {incomingCall && (
+                    <CallPopup
+                      incomingCall={incomingCall}
+                      caller={callerdetail}
+                      onAccept={handleCallAccepted}
+                      onReject={rejectCall}
+                    />
+                  )}
 
                   {callAccepted && channelName && token && (
                     <div>

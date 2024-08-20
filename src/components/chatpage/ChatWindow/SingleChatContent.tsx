@@ -34,6 +34,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
 }) => {
   const [open, setOpen] = React.useState(false);
   const [imagename, setImagename] = React.useState("");
+  // const [loading, setLoading] = React.useState<boolean>(true);
 
   const handleOpen = (filename: string) => {
     setImagename(filename);
@@ -61,6 +62,14 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
     >
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {/* {messageList.length > 0 ? ( */}
+        {/* {loading && messageList.length === 0 ? (
+          <Typography
+            variant="body1"
+            sx={{ p: 2, textAlign: "center", mb: "150px" }}
+          >
+            Loading...
+          </Typography>
+        ) : ( */}
         <List>
           {messageList.map((messageContent, index) => {
             const isSender = userDetails.UserID === messageContent.SenderID;
@@ -174,6 +183,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
             );
           })}
         </List>
+        {/* )} */}
         {/* // ) : (
         //   <Box>
         //     <h1>There is no conversation in this Chat</h1>
