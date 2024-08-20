@@ -120,11 +120,19 @@ import PhoneDisabledIcon from "@mui/icons-material/PhoneDisabled";
 import { User } from "../chatpage/ChatWindow/messagetypes";
 import { useUser } from "../context/UserContext.tsx";
 
+// interface CallPopupProps {
+//   incomingCall: string;
+//   caller: any;
+//   onAccept: () => void;
+//   onReject: () => void;
+// }
 interface CallPopupProps {
   incomingCall: string;
-  caller: any;
-  onAccept: () => void;
+  caller?: User; // Assuming 'User' is the type of the caller object
+  // isVisible: boolean; // Add this line to include the 'isVisible' prop
+  onAccept: () => Promise<void>;
   onReject: () => void;
+  // onClose: () => void;
 }
 
 const CallPopup: React.FC<CallPopupProps> = ({
