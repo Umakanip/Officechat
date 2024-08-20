@@ -43,11 +43,11 @@ const rtcClient: any = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 interface HeaderProps {
   selectedUser: User;
   onGroupCreate;
-  headerTitle: string | undefined;
+  Title: string | null;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  headerTitle,
+  Title,
   selectedUser,
   onGroupCreate,
 }) => {
@@ -74,6 +74,7 @@ const Header: React.FC<HeaderProps> = ({
     setActiveUser,
     setselectActiveUser,
     user,
+    headerTitle,
   } = useUser();
   const [channelName, setChannelName] = useState<string>("");
   const [token, setToken] = useState<string>("");
@@ -101,11 +102,6 @@ const Header: React.FC<HeaderProps> = ({
   var callerdetail;
 
   useEffect(() => {
-    console.log("user?.userdata?.UserID", headerTitle);
-  });
-  useEffect(() => {
-    // console.log("user?.userdata?.UserID", user?.userdata?.UserID);
-    // console.log("user?.userdata?.UserID", headerTitle);
     socket.emit("register", user?.userdata?.UserID);
 
     socket.on(
@@ -167,6 +163,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const startCall = async () => {
+    setIsCallPopupVisible(true);
     if (!selectedUser) return; // Handle case where selectedUser might be null
 
     const generatedChannelName = "testChannel";
@@ -184,7 +181,7 @@ const Header: React.FC<HeaderProps> = ({
       callerId,
       receiverIds: [receiverId],
     });
-
+    setIsCallPopupVisible(true);
     try {
       const callData = {
         CallerID: user?.userdata?.UserID as number,
@@ -216,7 +213,7 @@ const Header: React.FC<HeaderProps> = ({
     startCallTimer();
     try {
       setCallAccepted(true);
-      setIsCallPopupVisible(false);
+
       socket.emit("callAccepted", { channelName, callerId: incomingCall });
 
       // Start the local audio track
@@ -224,7 +221,7 @@ const Header: React.FC<HeaderProps> = ({
         await rtcClient.createMicrophoneAudioTrack();
       localAudioTrackRef.current = localAudioTrack;
       await rtcClient.publish([localAudioTrack]);
-
+      setIsCallPopupVisible(false);
       // Start the call duration timer
       // setCallDuration(0); // Reset the timer
       // callTimerRef.current = setInterval(() => {
@@ -240,6 +237,7 @@ const Header: React.FC<HeaderProps> = ({
       console.log("Call rejected");
       socket.emit("callRejected", { channelName, callerId: incomingCall });
       setIncomingCall(null);
+      setIsCallPopupVisible(false);
       setChannelName("");
       setToken("");
       if (localAudioTrackRef.current) {
@@ -370,8 +368,7 @@ const Header: React.FC<HeaderProps> = ({
           },
         }
       );
-      console.log("REsponse", response.data.insertedMembers[0].Username);
-      console.log("REsponse", response.data.group);
+
       const updatedGroup = response.data.group;
       setGroupDetails(updatedGroup); // Update with new group details
       setActiveGroup(updatedGroup.GroupID); // Ensure active group is updated
@@ -384,7 +381,6 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const handleSelectUser = (username) => {
-    console.log("User selected:", username);
     setQuery(username);
     setSelectedUserIDs(username);
     setSuggestions([]);
@@ -437,6 +433,11 @@ const Header: React.FC<HeaderProps> = ({
       // Handle the error, e.g., show a notification
     }
   };
+  useEffect(() => {
+    if (incomingCall || !isCallPopupVisible) {
+      setIsCallPopupVisible(true);
+    }
+  }, [incomingCall, isCallPopupVisible]);
 
   const handleOpenModal = (
     actionType: "delete" | "leave",
@@ -455,7 +456,7 @@ const Header: React.FC<HeaderProps> = ({
     setOpenModal(true);
   };
   const [secondary, setSecondary] = React.useState(false);
-
+  console.log("userDetails", selectedUser);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -474,15 +475,21 @@ const Header: React.FC<HeaderProps> = ({
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                   alt={
-                    selectedUser.UserID
-                      ? selectedUser.Username
-                      : selectedUser.GroupName
+                    selectedUser
+                      ? selectedUser.UserID
+                        ? selectedUser.Username
+                        : selectedUser.GroupName
+                        ? selectedUser.GroupName
+                        : headerTitle
+                      : headerTitle
                   }
                   src={selectedUser.ProfilePicture || undefined}
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
-                  {headerTitle}
+                  {selectedUser.UserID
+                    ? selectedUser.Username
+                    : selectedUser.GroupName}
                 </Typography>
               </Box>
 
@@ -492,14 +499,15 @@ const Header: React.FC<HeaderProps> = ({
                     <CallIcon />
                   </IconButton>
 
-                  {incomingCall && (
-                    <CallPopup
-                      incomingCall={incomingCall}
-                      caller={callerdetail}
-                      onAccept={handleCallAccepted}
-                      onReject={rejectCall}
-                    />
-                  )}
+                  {incomingCall ||
+                    (isCallPopupVisible && (
+                      <CallPopup
+                        incomingCall={incomingCall}
+                        caller={callerdetail}
+                        onAccept={handleCallAccepted}
+                        onReject={rejectCall}
+                      />
+                    ))}
 
                   {callAccepted && channelName && token && (
                     <div>

@@ -32,14 +32,8 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
   userDetails,
   messageList = [], // Default to an empty array if messageList is undefined
 }) => {
-  console.log("Singlechatcom", messageList);
   const [open, setOpen] = React.useState(false);
   const [imagename, setImagename] = React.useState("");
-
-  useEffect(() => {
-    console.log("messageList", messageList);
-    console.log(messageList.length);
-  }, [messageList]);
 
   const handleOpen = (filename: string) => {
     setImagename(filename);

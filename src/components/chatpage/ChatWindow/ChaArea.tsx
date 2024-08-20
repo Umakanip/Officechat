@@ -14,19 +14,11 @@ interface ChatAreaProps {
 
 const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   const [messageList, setMessageList] = useState<Message[]>([]);
-  const [headerTitle, setHeaderTitle] = useState<string>("");
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Set initial loading state to true
 
-  const {
-    activeGroup,
-    setActiveGroup,
-    setGroups,
-    activeUser,
-    setActiveUser,
-    selectActiveUser,
-    setselectActiveUser,
-  } = useUser();
+  const { activeGroup, activeUser, headerTitle, setHeaderTitle } = useUser();
 
   useEffect(() => {
     // console.log("activeUser", userDetails);
@@ -53,13 +45,13 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           console.log("No messages found:", response.data.error);
           setMessageList([]);
         } else {
-          setMessageList(response.data);
-          setHeaderTitle(response.data.GroupName || response.data.Username);
+          // setMessageList(response.data);
           // Delay the display of messages by 3 seconds
           setTimeout(() => {
+            setHeaderTitle(response.data.GroupName || response.data.Username);
             setMessageList(response.data);
             setLoading(false); // Stop loading after messages are set
-          }, 3000);
+          }, 1000);
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -105,7 +97,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
         <Header
-          headerTitle={headerTitle}
+          Title={headerTitle}
           selectedUser={selectedUser || userDetails}
           onGroupCreate={handleGroupCreate}
         />

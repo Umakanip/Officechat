@@ -92,7 +92,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
         const response = await axios.get(
           "http://localhost:3000/api/getActiveUser"
         );
-        console.log("responseresponse", response);
+
         setLoggedInUsers(response.data);
       }, 5000); // Send every 5 seconds
 

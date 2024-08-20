@@ -20,15 +20,11 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   messageList,
 }) => {
   const renderChatContent = () => {
-    console.log("REnder component", userDetails);
-    console.log("REnder component", messageList);
     if (userDetails?.GroupID) {
-      console.log("IF");
       return (
         <GroupChatContent userDetails={userDetails} messageList={messageList} />
       );
     } else {
-      console.log("ELSE");
       return (
         <SingleChatContent
           userDetails={userDetails}

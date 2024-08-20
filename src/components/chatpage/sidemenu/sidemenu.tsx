@@ -309,38 +309,31 @@ const SideMenu: React.FC<SideMenuProps> = ({ groupChats, onSelectChat }) => {
           }}
         >
           <List>
-            {menuItems.map(
-              (item, index) => (
-                console.log("item:", item),
-                (
-                  <ListItem
-                    button
-                    key={index}
-                    onClick={() => handleMenuItemClick(item.component)}
-                    sx={{
-                      flexDirection: "column",
-                      alignItems: "center",
-                      textAlign: "center",
-                      backgroundColor: "transparent", // Highlight active item
-                      borderLeft:
-                        selectedComponent === item.component
-                          ? "2px solid rgb(98, 109, 205)"
-                          : "none", // Border for active item
-                      color:
-                        selectedComponent === item.component
-                          ? "#3e849e"
-                          : "none", // Border for active item
-                    }}
-                  >
-                    <Icon sx={{ fontSize: "24px", mb: 1 }}>{item.icon}</Icon>
-                    <ListItemText
-                      primary={item.text}
-                      primaryTypographyProps={{ fontSize: "12px" }}
-                    />
-                  </ListItem>
-                )
-              )
-            )}
+            {menuItems.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => handleMenuItemClick(item.component)}
+                sx={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  backgroundColor: "transparent", // Highlight active item
+                  borderLeft:
+                    selectedComponent === item.component
+                      ? "2px solid rgb(98, 109, 205)"
+                      : "none", // Border for active item
+                  color:
+                    selectedComponent === item.component ? "#3e849e" : "none", // Border for active item
+                }}
+              >
+                <Icon sx={{ fontSize: "24px", mb: 1 }}>{item.icon}</Icon>
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{ fontSize: "12px" }}
+                />
+              </ListItem>
+            ))}
           </List>
           <Divider />
         </Box>

@@ -71,6 +71,7 @@ function Header() {
     setselectActiveUser,
     Contact,
     setContact,
+    setHeaderTitle,
   } = useUser();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,10 +99,11 @@ function Header() {
   };
 
   const handleSelectUser = (user: User) => {
-    console.log("User selected:", typeof user.UserID);
+    console.log("User selected:", user.Username);
 
     setSearchTerm(user.Username);
     setActiveGroup(null); // Clear active group
+    setHeaderTitle(user.Username);
     setActiveUser(user.UserID); // Set the selected user as active
     setselectActiveUser(user);
     setSelectedUserId(user.UserID);
@@ -111,7 +113,7 @@ function Header() {
     const newUser = user;
 
     if (!Contact.some((user) => user.UserID === newUser.UserID)) {
-        setContact((prevUserList) => [...prevUserList, newUser]);
+      setContact((prevUserList) => [...prevUserList, newUser]);
     }
 
     // This code checks if the selected user is already the active user
@@ -240,14 +242,17 @@ function Header() {
           setActiveUser(selectActiveUser.UserID);
         }
       } else {
-        console.error("Failed to send message, response status:", response.status);
+        console.error(
+          "Failed to send message, response status:",
+          response.status
+        );
       }
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log("selectActiveUser", selectActiveUser);
   }, [selectActiveUser]);
 
@@ -306,25 +311,25 @@ function Header() {
             >
               <AccountCircle />
             </IconButton>
-            </Box>
-            <Box sx={{ display: { xs: "flex", md: "none" } }}>
-        <IconButton
-          size="large"
-          aria-label="show more"
-          aria-controls={mobileMenuId}
-          aria-haspopup="true"
-          onClick={handleMobileMenuOpen}
-          color="inherit"
-        >
-          <MoreIcon />
-        </IconButton>
-      </Box>
-    </Toolbar>
-  </AppBar>
-  {renderMobileMenu}
-  {renderMenu}
-</Box>
-);
+          </Box>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit"
+            >
+              <MoreIcon />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      {renderMobileMenu}
+      {renderMenu}
+    </Box>
+  );
 }
 
 export default Header;
