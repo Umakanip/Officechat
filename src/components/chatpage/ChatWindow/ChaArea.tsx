@@ -6,6 +6,7 @@ import ChatComponent from "./RenderChatComponent.tsx";
 import { Message, User } from "./messagetypes.ts";
 import axios from "axios";
 import { useUser } from "../../context/UserContext.tsx";
+import _ from "lodash"; // Import lodash for debouncing
 
 interface ChatAreaProps {
   userDetails: User; // Adjust type if needed
@@ -31,7 +32,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     console.log("activeUser", selectActiveUser);
     if (selectActiveUser) {
       setSelectedUser(selectActiveUser);
-      setHeaderTitle(selectActiveUser.Username || "User");
+      setHeaderTitle(selectActiveUser.Username);
     } else if (activeUser) {
       const fetchUserDetails = async () => {
         try {
@@ -39,7 +40,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/users/${activeUser}`
           );
           setSelectedUser(response.data);
-          setHeaderTitle(response.data.Username || "User");
+          setHeaderTitle(response.data.Username);
         } catch (error) {
           console.error("Error fetching user details:", error);
         }
@@ -49,6 +50,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   }, [selectActiveUser, activeUser]);
 
   useEffect(() => {
+    console.log("activeUser", selectActiveUser);
+
     const fetchMessages = async () => {
       setLoading(true); // Start loading before fetching messages
       try {
@@ -58,6 +61,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/groupmessages?groupid=${selectedUser.GroupID}`
           );
         } else if (activeUser) {
+          console.log("else if");
           response = await axios.get(
             `http://localhost:3000/api/messages/${activeUser}`
           );
@@ -81,9 +85,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
         setLoading(true); // Continue showing loading state if there's an error
       }
     };
+    // }, 300);
 
     fetchMessages();
-  }, [selectedUser, activeUser, activeGroup]);
+    // Clean up the debounce on component unmount
+    // return () => {
+    //   fetchMessages.cancel();
+    // };
+  }, [selectedUser?.GroupID, activeUser, activeGroup]);
 
   const handleGroupCreate = (newGroup: User) => {
     console.log("Groupdata", newGroup);
@@ -96,20 +105,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     setMessageList([]);
   };
 
-  useEffect(() => {
-    if (userDetails) {
-      setSelectedUser(userDetails);
-      setHeaderTitle(userDetails.GroupName || userDetails.Username || "Chat");
-      setMessageList([]);
-    }
-  }, [userDetails]);
+  // useEffect(() => {
+  //   if (userDetails) {
+  //     // setSelectedUser(userDetails);
+  //     setHeaderTitle(userDetails.GroupName || userDetails.Username);
+  //     setMessageList([]);
+  //   }
+  // }, [userDetails]);
 
-  useEffect(() => {
-    if (selectedUser) {
-      setHeaderTitle(selectedUser.Username || "User");
-    }
-  }, [selectedUser]);
-
+  // useEffect(() => {
+  //   if (selectedUser) {
+  //     setHeaderTitle(selectedUser.Username);
+  //   }
+  // }, [selectedUser]);
+  console.log("SELECTUSER", selectedUser);
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
@@ -138,8 +147,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
 };
 
 export default ChatArea;
-
-
 
 // import React, { useState, useEffect } from "react";
 // import { Box, Typography } from "@mui/material";
