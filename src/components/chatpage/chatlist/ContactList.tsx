@@ -40,13 +40,14 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
     activeUser,
     setActiveUser,
     setSelectedUserId,
+    selectActiveUser,
   } = useUser();
   const [userStatus, setUsersStatus] = useState<Map<number, boolean>>(
     new Map()
   );
 
   useEffect(() => {
-    console.log("groupsgroups", activeGroup);
+    console.log("groupsgroups", selectActiveUser);
 
     axios
       .get(`http://localhost:3000/api/users/${user?.userdata?.UserID}`)

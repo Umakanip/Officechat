@@ -86,8 +86,13 @@ const Header: React.FC<HeaderProps> = ({
   const [callerId, setCallerId] = useState<string | null>(type);
   const [caller, setCaller] = useState<User | null>(null);
   var callerdetail;
+
   useEffect(() => {
-    console.log("user?.userdata?.UserID", user?.userdata?.UserID);
+    console.log("user?.userdata?.UserID", headerTitle);
+  });
+  useEffect(() => {
+    // console.log("user?.userdata?.UserID", user?.userdata?.UserID);
+    // console.log("user?.userdata?.UserID", headerTitle);
     socket.emit("register", user?.userdata?.UserID);
 
     socket.on(
@@ -237,51 +242,6 @@ const Header: React.FC<HeaderProps> = ({
       setSuggestionsVisible(false);
     }
   };
-
-  // const handleCreateGroup = async () => {
-  //   // Handle the "Create" button logic here
-  //   console.log("Email:Email:", selectedUserIDs);
-  //   console.log("Email:", (selectedUser as User).UserID || null);
-  //   const namesArray = query
-  //     .split(",")
-  //     .map((name) => name.trim())
-  //     .filter((name) => name.length > 0);
-  //   const groupname = [(selectedUser as User).Username, ...namesArray].join(
-  //     ", "
-  //   );
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:3000/api/creategroup?`,
-  //       {
-  //         // Email: groupEmail,
-  //         GroupName: groupname,
-  //         Username: [(selectedUser as User).Username, ...namesArray],
-  //         CreatedBy: (selectedUser as User).UserID || null,
-  //         CreatedAt: new Date(),
-  //       },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     console.log("REsponse", response.data);
-  //     setGroupDetails(response.data);
-  //     const newGroup = response.data;
-
-  //     setGroups((prevGroups) => [newGroup, ...prevGroups]);
-  //     setActiveGroup(response.data.GroupID);
-  //     setActiveUser(null);
-  //     setselectActiveUser(null);
-  //     onGroupCreate(newGroup); // Pass the new group information
-  //     setQuery(""); // Clear the input
-
-  //     handlePopoverClose(); // Close the popover after action
-  //     // setHeaderTitle(response.data.group.GroupName);
-  //   } catch (error: any) {
-  //     console.error("Error sending data:", error);
-  //   }
-  // };
 
   const handleCreateGroup = async () => {
     console.log("Selected User IDs:", selectedUserIDs);
@@ -461,9 +421,7 @@ const Header: React.FC<HeaderProps> = ({
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
-                  {selectedUser.UserID
-                    ? selectedUser.Username
-                    : selectedUser.GroupName}
+                  {headerTitle}
                 </Typography>
               </Box>
               {/* <GroupIcon

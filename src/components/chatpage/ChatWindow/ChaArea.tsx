@@ -29,36 +29,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   } = useUser();
 
   useEffect(() => {
-    console.log("activeUser", selectActiveUser);
-    if (selectActiveUser) {
-      setSelectedUser(selectActiveUser);
-      setHeaderTitle(selectActiveUser.Username);
-    } else if (activeUser) {
-      const fetchUserDetails = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:3000/api/users/${activeUser}`
-          );
-          setSelectedUser(response.data);
-          setHeaderTitle(response.data.Username);
-        } catch (error) {
-          console.error("Error fetching user details:", error);
-        }
-      };
-      fetchUserDetails();
-    }
-  }, [selectActiveUser, activeUser]);
-
-  useEffect(() => {
-    console.log("activeUser", selectActiveUser);
+    // console.log("activeUser", userDetails);
 
     const fetchMessages = async () => {
       setLoading(true); // Start loading before fetching messages
       try {
         let response;
-        if (selectedUser?.GroupID) {
+        console.log("selectedUser?.GroupID", userDetails?.GroupID);
+        if (userDetails?.GroupID) {
           response = await axios.get(
-            `http://localhost:3000/api/groupmessages?groupid=${selectedUser.GroupID}`
+            `http://localhost:3000/api/groupmessages?groupid=${userDetails.GroupID}`
           );
         } else if (activeUser) {
           console.log("else if");
@@ -74,6 +54,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           setMessageList([]);
         } else {
           setMessageList(response.data);
+          setHeaderTitle(response.data.GroupName || response.data.Username);
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -89,7 +70,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     // return () => {
     //   fetchMessages.cancel();
     // };
-  }, [selectedUser?.GroupID, activeUser, activeGroup]);
+  }, [userDetails?.GroupID, activeUser, activeGroup]);
 
   const handleGroupCreate = (newGroup: User) => {
     console.log("Groupdata", newGroup);
@@ -102,20 +83,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     setMessageList([]);
   };
 
-  // useEffect(() => {
-  //   if (userDetails) {
-  //     // setSelectedUser(userDetails);
-  //     setHeaderTitle(userDetails.GroupName || userDetails.Username);
-  //     setMessageList([]);
-  //   }
-  // }, [userDetails]);
+  useEffect(() => {
+    if (userDetails) {
+      // setSelectedUser(userDetails);
+      setHeaderTitle(userDetails.GroupName || userDetails.Username);
+      setMessageList([]);
+    }
+  }, [userDetails]);
 
   // useEffect(() => {
   //   if (selectedUser) {
   //     setHeaderTitle(selectedUser.Username);
   //   }
   // }, [selectedUser]);
-  console.log("SELECTUSER", selectedUser);
+  console.log("SELECTUSER", headerTitle);
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
