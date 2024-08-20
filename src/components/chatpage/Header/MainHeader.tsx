@@ -101,7 +101,7 @@ function Header() {
   const handleSelectUser = (user: User) => {
     console.log("User selected:", user.Username);
 
-    setSearchTerm(user.Username);
+    setSearchTerm();
     setActiveGroup(null); // Clear active group
     setHeaderTitle(user.Username);
     setActiveUser(user.UserID); // Set the selected user as active
@@ -113,7 +113,8 @@ function Header() {
     const newUser = user;
 
     if (!Contact.some((user) => user.UserID === newUser.UserID)) {
-      setContact((prevUserList) => [...prevUserList, newUser]);
+      setHeaderTitle(newUser.Username);
+      setContact((prevUserList) => [newUser, ...prevUserList]);
     }
 
     // This code checks if the selected user is already the active user

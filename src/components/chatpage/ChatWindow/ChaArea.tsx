@@ -48,7 +48,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           setTimeout(() => {
             setNoConversation(true);
             setLoading(false); // Stop loading
-          }, 3000);
+          }, 1000);
         } else {
           // setMessageList(response.data);
           // Delay the display of messages by 3 seconds

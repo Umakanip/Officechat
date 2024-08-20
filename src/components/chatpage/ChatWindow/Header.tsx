@@ -450,6 +450,7 @@ const Header: React.FC<HeaderProps> = ({
   };
   const [secondary, setSecondary] = React.useState(false);
   console.log("userDetails", selectedUser);
+  console.log("userDetails", headerTitle);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -468,21 +469,26 @@ const Header: React.FC<HeaderProps> = ({
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                   alt={
-                    selectedUser
-                      ? selectedUser.UserID
-                        ? selectedUser.Username
-                        : selectedUser.GroupName
-                        ? selectedUser.GroupName
-                        : headerTitle
-                      : headerTitle
+                    selectedUser.UserID
+                      ? selectedUser.Username
+                      : selectedUser.GroupName
                   }
                   src={selectedUser.ProfilePicture || undefined}
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
-                  {selectedUser.UserID
+                  {headerTitle
+                    ? headerTitle
+                    : selectedUser.UserID
                     ? selectedUser.Username
                     : selectedUser.GroupName}
+                  {/* {selectedUser
+                    ? selectedUser.UserID
+                      ? selectedUser.Username
+                      : selectedUser.GroupName
+                      ? selectedUser.GroupName
+                      : headerTitle
+                    : headerTitle} */}
                 </Typography>
               </Box>
 

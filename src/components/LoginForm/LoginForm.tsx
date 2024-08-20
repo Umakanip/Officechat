@@ -5,7 +5,7 @@ import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext.tsx";
 import axios from "axios";
-
+import io, { Socket } from "socket.io-client";
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 `;
@@ -62,7 +62,7 @@ const Wrapper = styled.div`
         font-size: 50px;
         text-align: center;
         margin-bottom: 45px;
-        color: #55565B; 
+        color: #55565b;
       }
       .input-field {
         display: flex;
@@ -93,8 +93,8 @@ const Wrapper = styled.div`
           top: -20px;
           left: 10px;
           pointer-events: none;
-          transition: .5s;
-          color: #75767B;
+          transition: 0.5s;
+          color: #75767b;
         }
         .icon {
           position: absolute;
@@ -113,9 +113,9 @@ const Wrapper = styled.div`
         width: 150px;
         background: #f1b04c;
         border-radius: 5px;
-        transition: .4s;
+        transition: 0.4s;
         &:hover {
-        background: #f97613;
+          background: #f97613;
           color: #fff;
         }
       }
@@ -126,7 +126,7 @@ const Wrapper = styled.div`
         span a {
           font-weight: 450;
           color: #000;
-          transition: .5s;
+          transition: 0.5s;
           &:hover {
             text-decoration: underline;
           }
@@ -155,6 +155,8 @@ const Wrapper = styled.div`
   }
 `;
 
+const socket: Socket = io("http://localhost:5000");
+
 const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -178,6 +180,7 @@ const LoginForm: React.FC = () => {
       };
 
       setUser(userDetails);
+      socket.emit("login", userDetails.userdata.UserID);
       navigate("/chatpage", { state: { userDetails } });
     } catch (err: any) {
       if (err.response) {
@@ -197,7 +200,16 @@ const LoginForm: React.FC = () => {
       <GlobalStyle />
       <Wrapper>
         <div className="side-image">
-          <img src="clubits.png" alt="logo" style={{ position: "absolute", top: "30px", left: "30px", width: "150px" }} />
+          <img
+            src="clubits.png"
+            alt="logo"
+            style={{
+              position: "absolute",
+              top: "30px",
+              left: "30px",
+              width: "150px",
+            }}
+          />
         </div>
         <div className="right">
           <div className="input-box">
@@ -210,7 +222,8 @@ const LoginForm: React.FC = () => {
                 required
                 autoComplete="off"
                 onChange={(e) => setEmail(e.target.value)}
-              /><br />
+              />
+              <br />
               <label htmlFor="email">Email</label>
             </div>
             <div className="input-field">
@@ -223,18 +236,41 @@ const LoginForm: React.FC = () => {
               />
               <label htmlFor="pass">Password</label>
               {showPassword ? (
-                <FaEyeSlash onClick={togglePasswordVisibility} className="icon" />
+                <FaEyeSlash
+                  onClick={togglePasswordVisibility}
+                  className="icon"
+                />
               ) : (
                 <FaEye onClick={togglePasswordVisibility} className="icon" />
               )}
             </div>
-            <a href="#" style={{ color: '#006FFC', marginLeft: '200px', cursor: 'no-drop' }}>Forgot Password?</a><br /><br />
+            <a
+              href="#"
+              style={{
+                color: "#006FFC",
+                marginLeft: "200px",
+                cursor: "no-drop",
+              }}
+            >
+              Forgot Password?
+            </a>
+            <br />
+            <br />
             {error && <p style={{ color: "red" }}>{error}</p>}
-            <Button variant="contained" onClick={handleLogin} className="submit">
+            <Button
+              variant="contained"
+              onClick={handleLogin}
+              className="submit"
+            >
               LOGIN
             </Button>
             <div className="signUp">
-              <span style={{ color: '#75767B' }}>Don't have an account? <a href="#" style={{ color: '#006FFC', cursor: 'no-drop' }}>Signup here</a></span>
+              <span style={{ color: "#75767B" }}>
+                Don't have an account?{" "}
+                <a href="#" style={{ color: "#006FFC", cursor: "no-drop" }}>
+                  Signup here
+                </a>
+              </span>
             </div>
           </div>
         </div>
