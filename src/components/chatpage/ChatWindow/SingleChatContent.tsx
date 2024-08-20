@@ -128,7 +128,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                     borderRadius: "10px",
                     backgroundColor: isSender ? "#f1f0f0" : "#e1ffc7",
                     boxShadow: 2,
-                    textAlign: isSender ? "right" : "left",
+                    textAlign: isSender ? "left" : "right",
                     margin: "5px",
                   }}
                 >
