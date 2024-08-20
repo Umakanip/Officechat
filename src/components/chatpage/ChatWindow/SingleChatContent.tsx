@@ -126,7 +126,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                 key={index}
                 style={{
                   display: "flex",
-                  justifyContent: isSender ? "flex-end" : "flex-start",
+                  justifyContent: isSender ? "flex-start" : "flex-end",
                   padding: "0px",
                 }}
               >
@@ -137,7 +137,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                     borderRadius: "10px",
                     backgroundColor: isSender ? "#f1f0f0" : "#e1ffc7",
                     boxShadow: 2,
-                    textAlign: isSender ? "left" : "left",
+                    textAlign: isSender ? "left" : "right",
                     margin: "5px",
                   }}
                 >
