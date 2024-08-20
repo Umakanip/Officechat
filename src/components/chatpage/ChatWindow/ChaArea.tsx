@@ -6,6 +6,7 @@ import ChatComponent from "./RenderChatComponent.tsx";
 import { Message, User } from "./messagetypes.ts";
 import axios from "axios";
 import { useUser } from "../../context/UserContext.tsx";
+import _ from "lodash"; // Import lodash for debouncing
 
 interface ChatAreaProps {
   userDetails: User; // Adjust type if needed
@@ -15,7 +16,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [headerTitle, setHeaderTitle] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); // Add loading state
+  const [loading, setLoading] = useState<boolean>(true); // Set initial loading state to true
 
   const {
     activeGroup,
@@ -31,7 +32,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     console.log("activeUser", selectActiveUser);
     if (selectActiveUser) {
       setSelectedUser(selectActiveUser);
-      setHeaderTitle(selectActiveUser.Username || "User");
+      setHeaderTitle(selectActiveUser.Username);
     } else if (activeUser) {
       const fetchUserDetails = async () => {
         try {
@@ -39,7 +40,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/users/${activeUser}`
           );
           setSelectedUser(response.data);
-          setHeaderTitle(response.data.Username || "User");
+          setHeaderTitle(response.data.Username);
         } catch (error) {
           console.error("Error fetching user details:", error);
         }
@@ -49,6 +50,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   }, [selectActiveUser, activeUser]);
 
   useEffect(() => {
+    console.log("activeUser", selectActiveUser);
+
     const fetchMessages = async () => {
       setLoading(true); // Start loading before fetching messages
       try {
@@ -58,6 +61,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             `http://localhost:3000/api/groupmessages?groupid=${selectedUser.GroupID}`
           );
         } else if (activeUser) {
+          console.log("else if");
           response = await axios.get(
             `http://localhost:3000/api/messages/${activeUser}`
           );
@@ -69,18 +73,26 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           console.log("No messages found:", response.data.error);
           setMessageList([]);
         } else {
-          setMessageList(response.data);
+          // Delay the display of messages by 3 seconds
+          setTimeout(() => {
+            setMessageList(response.data);
+            setLoading(false); // Stop loading after messages are set
+          }, 3000);
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
-        setMessageList([]);
-      } finally {
-        setLoading(false); // Stop loading after fetching messages
+        setMessageList([]); // Ensure messageList is empty on error
+        setLoading(true); // Continue showing loading state if there's an error
       }
     };
+    // }, 300);
 
     fetchMessages();
-  }, [selectedUser, activeUser, activeGroup]);
+    // Clean up the debounce on component unmount
+    // return () => {
+    //   fetchMessages.cancel();
+    // };
+  }, [selectedUser?.GroupID, activeUser, activeGroup]);
 
   const handleGroupCreate = (newGroup: User) => {
     console.log("Groupdata", newGroup);
@@ -93,20 +105,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     setMessageList([]);
   };
 
-  useEffect(() => {
-    if (userDetails) {
-      setSelectedUser(userDetails);
-      setHeaderTitle(userDetails.GroupName || userDetails.Username || "Chat");
-      setMessageList([]);
-    }
-  }, [userDetails]);
+  // useEffect(() => {
+  //   if (userDetails) {
+  //     // setSelectedUser(userDetails);
+  //     setHeaderTitle(userDetails.GroupName || userDetails.Username);
+  //     setMessageList([]);
+  //   }
+  // }, [userDetails]);
 
-  useEffect(() => {
-    if (selectedUser) {
-      setHeaderTitle(selectedUser.Username || "User");
-    }
-  }, [selectedUser]);
-
+  // useEffect(() => {
+  //   if (selectedUser) {
+  //     setHeaderTitle(selectedUser.Username);
+  //   }
+  // }, [selectedUser]);
+  console.log("SELECTUSER", selectedUser);
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
@@ -116,8 +128,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           onGroupCreate={handleGroupCreate}
         />
         {loading ? (
-          <Typography variant="body1" sx={{ p: 2, textAlign: "center" }}>
-            Loading messages...
+          <Typography variant="body1" sx={{ p: 2, textAlign: "center", mb: "150px" }}>
+            Loading...
           </Typography>
         ) : (
           <ChatComponent

@@ -297,10 +297,60 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  // const handleCreateGroup = async () => {
+  //   // Handle the "Create" button logic here
+  //   console.log("Email:Email:", selectedUserIDs);
+  //   console.log("Email:", (selectedUser as User).UserID || null);
+  //   const namesArray = query
+  //     .split(",")
+  //     .map((name) => name.trim())
+  //     .filter((name) => name.length > 0);
+  //   const groupname = [(selectedUser as User).Username, ...namesArray].join(
+  //     ", "
+  //   );
+  //   try {
+  //     const response = await axios.post(
+  //       `http://localhost:3000/api/creategroup?`,
+  //       {
+  //         // Email: groupEmail,
+  //         GroupName: groupname,
+  //         Username: [(selectedUser as User).Username, ...namesArray],
+  //         CreatedBy: (selectedUser as User).UserID || null,
+  //         CreatedAt: new Date(),
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     console.log("REsponse", response.data);
+  //     setGroupDetails(response.data);
+  //     const newGroup = response.data;
+
+  //     setGroups((prevGroups) => [newGroup, ...prevGroups]);
+  //     setActiveGroup(response.data.GroupID);
+  //     setActiveUser(null);
+  //     setselectActiveUser(null);
+  //     onGroupCreate(newGroup); // Pass the new group information
+  //     setQuery(""); // Clear the input
+
+  //     handlePopoverClose(); // Close the popover after action
+  //     // setHeaderTitle(response.data.group.GroupName);
+  //   } catch (error: any) {
+  //     console.error("Error sending data:", error);
+  //   }
+  // };
+
   const handleCreateGroup = async () => {
-    // Handle the "Create" button logic here
-    console.log("Email:Email:", selectedUserIDs);
-    console.log("Email:", (selectedUser as User).UserID || null);
+    console.log("Selected User IDs:", selectedUserIDs);
+    console.log("Logged-in User ID:", (selectedUser as User).UserID);
+
+    const loggedInUserId = user?.userdata?.UserID || null;
+
+    // Ensure the logged-in user is added to the group
+    const userIDs = [...selectedUserIDs, loggedInUserId];
+
     const namesArray = query
       .split(",")
       .map((name) => name.trim())
@@ -308,14 +358,14 @@ const Header: React.FC<HeaderProps> = ({
     const groupname = [(selectedUser as User).Username, ...namesArray].join(
       ", "
     );
+
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/creategroup?`,
+        `http://localhost:3000/api/creategroup`,
         {
-          // Email: groupEmail,
           GroupName: groupname,
           Username: [(selectedUser as User).Username, ...namesArray],
-          CreatedBy: (selectedUser as User).UserID || null,
+          CreatedBy: loggedInUserId,
           CreatedAt: new Date(),
         },
         {
@@ -324,7 +374,7 @@ const Header: React.FC<HeaderProps> = ({
           },
         }
       );
-      console.log("REsponse", response.data);
+      console.log("Response", response.data);
       setGroupDetails(response.data);
       const newGroup = response.data;
 
@@ -336,7 +386,6 @@ const Header: React.FC<HeaderProps> = ({
       setQuery(""); // Clear the input
 
       handlePopoverClose(); // Close the popover after action
-      // setHeaderTitle(response.data.group.GroupName);
     } catch (error: any) {
       console.error("Error sending data:", error);
     }
@@ -469,16 +518,16 @@ const Header: React.FC<HeaderProps> = ({
                 <Avatar
                   alt={
                     selectedUser.UserID
-                      ? selectedUser.Username || "User"
-                      : selectedUser.GroupName || "Group"
+                      ? selectedUser.Username
+                      : selectedUser.GroupName
                   }
                   src={selectedUser.ProfilePicture || undefined}
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
                   {selectedUser.UserID
-                    ? selectedUser.Username || "User"
-                    : selectedUser.GroupName || "Group"}
+                    ? selectedUser.Username
+                    : selectedUser.GroupName}
                 </Typography>
               </Box>
               {/* <GroupIcon
