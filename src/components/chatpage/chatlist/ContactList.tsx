@@ -28,7 +28,6 @@ const socket = io("http://localhost:5000");
 
 const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
   // console.log(onSelectUser);
-  const [Contact, setContact] = useState<any[]>([]);
   // const [Group, setGroup] = useState();
   const { user, groups, setGroups } = useUser();
   const [error, setError] = useState<string | null>(null);
@@ -40,13 +39,17 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
     activeUser,
     setActiveUser,
     setSelectedUserId,
+    setselectActiveUser,
+    selectActiveUser,
+    Contact,
+    setContact,
   } = useUser();
   const [userStatus, setUsersStatus] = useState<Map<number, boolean>>(
     new Map()
   );
 
   useEffect(() => {
-    console.log("groupsgroups", activeGroup);
+    console.log("groupsgroups", selectActiveUser);
 
     // axios
     //   // .get("http://localhost:3000/api/users")

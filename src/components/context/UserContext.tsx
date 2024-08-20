@@ -34,6 +34,8 @@ interface UserContextProps {
   logout: () => void;
   selectActiveUser: User | null;
   setselectActiveUser: (user: User) => void;
+  Contact: User[];
+  setContact: React.Dispatch<React.SetStateAction<User[]>>; // Update this line
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -47,6 +49,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [activeUser, setActiveUser] = useState<number | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectActiveUser, setselectActiveUser] = useState<User | null>(null);
+  const [Contact, setContact] = useState<User[]>([]);
+  //const [Contact, setContact] = useState<User[]>([]);
   const logout = () => {
     setUser(null);
     // Optionally, perform additional cleanup (e.g., clear tokens)
@@ -85,6 +89,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         logout,
         selectActiveUser,
         setselectActiveUser,
+        Contact,
+        setContact
       }}
     >
       {children}

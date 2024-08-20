@@ -15,7 +15,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [headerTitle, setHeaderTitle] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); // Add loading state
+  const [loading, setLoading] = useState<boolean>(true); // Set initial loading state to true
 
   const {
     activeGroup,
@@ -69,13 +69,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           console.log("No messages found:", response.data.error);
           setMessageList([]);
         } else {
-          setMessageList(response.data);
+          // Delay the display of messages by 3 seconds
+          setTimeout(() => {
+            setMessageList(response.data);
+            setLoading(false); // Stop loading after messages are set
+          }, 3000);
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
-        setMessageList([]);
-      } finally {
-        setLoading(false); // Stop loading after fetching messages
+        setMessageList([]); // Ensure messageList is empty on error
+        setLoading(true); // Continue showing loading state if there's an error
       }
     };
 
@@ -116,8 +119,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           onGroupCreate={handleGroupCreate}
         />
         {loading ? (
-          <Typography variant="body1" sx={{ p: 2, textAlign: "center" }}>
-            Loading messages...
+          <Typography variant="body1" sx={{ p: 2, textAlign: "center", mb: "150px" }}>
+            Loading...
           </Typography>
         ) : (
           <ChatComponent
@@ -135,6 +138,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
 };
 
 export default ChatArea;
+
+
 
 // import React, { useState, useEffect } from "react";
 // import { Box, Typography } from "@mui/material";
