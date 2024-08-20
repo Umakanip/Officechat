@@ -14,26 +14,24 @@ interface ChatAreaProps {
 
 const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
   const [messageList, setMessageList] = useState<Message[]>([]);
-
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Set initial loading state to true
+  const [noConversation, setNoConversation] = useState<boolean>(false);
 
   const { activeGroup, activeUser, headerTitle, setHeaderTitle } = useUser();
 
   useEffect(() => {
-    // console.log("activeUser", userDetails);
-
     const fetchMessages = async () => {
       setLoading(true); // Start loading before fetching messages
+      setNoConversation(false); // Reset noConversation state
+
       try {
         let response;
-        console.log("selectedUser?.GroupID", userDetails?.GroupID);
         if (userDetails?.GroupID) {
           response = await axios.get(
             `http://localhost:3000/api/groupmessages?groupid=${userDetails.GroupID}`
           );
         } else if (activeUser) {
-          console.log("else if");
           response = await axios.get(
             `http://localhost:3000/api/messages/${activeUser}`
           );
@@ -41,35 +39,32 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
           return;
         }
 
-        if (response.data.error) {
-          console.log("No messages found:", response.data.error);
-          setMessageList([]);
+        if (response.data.error || response.data.length === 0) {
+          console.log("No messages found:", response.data.error || "Empty data");
+          // Delay the display of 'No conversation' message by 3 seconds
+          setTimeout(() => {
+            setNoConversation(true);
+            setLoading(false); // Stop loading
+          }, 3000);
         } else {
-          // setMessageList(response.data);
-          // Delay the display of messages by 3 seconds
           setTimeout(() => {
             setHeaderTitle(response.data.GroupName || response.data.Username);
             setMessageList(response.data);
             setLoading(false); // Stop loading after messages are set
-          }, 1000);
+          }, 3000);
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
         setMessageList([]); // Ensure messageList is empty on error
-        setLoading(true); // Continue showing loading state if there's an error
+        setNoConversation(true); // Set noConversation state on error
+        setLoading(false); // Stop loading state on error
       }
     };
-    // }, 300);
 
     fetchMessages();
-    // Clean up the debounce on component unmount
-    // return () => {
-    //   fetchMessages.cancel();
-    // };
   }, [userDetails?.GroupID, activeUser, activeGroup]);
 
   const handleGroupCreate = (newGroup: User) => {
-    console.log("Groupdata", newGroup);
     setSelectedUser({
       ...newGroup,
       GroupID: newGroup.GroupID,
@@ -81,18 +76,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
 
   useEffect(() => {
     if (userDetails) {
-      // setSelectedUser(userDetails);
       setHeaderTitle(userDetails.GroupName || userDetails.Username);
       setMessageList([]);
     }
   }, [userDetails]);
 
-  // useEffect(() => {
-  //   if (selectedUser) {
-  //     setHeaderTitle(selectedUser.Username);
-  //   }
-  // }, [selectedUser]);
-  console.log("SELECTUSER", headerTitle);
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", height: "80vh" }}>
@@ -107,6 +95,15 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
             sx={{ p: 2, textAlign: "center", mb: "150px" }}
           >
             Loading...
+          </Typography>
+        ) : noConversation ? (
+          <Typography
+            variant="h4"
+            sx={{ p: 2, textAlign: "center", mb: "150px" }}
+          >
+            {userDetails.GroupID
+              ? "There is no conversation in this Group"
+              : "There is no conversation in this Chat"}
           </Typography>
         ) : (
           <ChatComponent
