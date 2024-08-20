@@ -69,15 +69,16 @@ function Header() {
     setSelectedUserId,
     selectActiveUser,
     setselectActiveUser,
-    contacts,
-    setContacts, // Assuming you have a state or function to manage contacts
+    Contact,
+    setContact,
   } = useUser();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<User[]>([]);
   const [suggestionsVisible, setSuggestionsVisible] = useState(false);
-
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+    useState<null | HTMLElement>(null);
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -107,13 +108,18 @@ function Header() {
     setSearchSuggestions([]);
     setSuggestionsVisible(false);
 
-    // Add the user to contacts if not already present
-    const userInContacts = contacts.find(
-      (contact) => contact.UserID === user.UserID
-    );
+    const newUser = user;
 
-    if (!userInContacts) {
-      setContacts((prevContacts) => [...prevContacts, user]);
+    if (!Contact.some((user) => user.UserID === newUser.UserID)) {
+        setContact((prevUserList) => [...prevUserList, newUser]);
+    }
+
+    // This code checks if the selected user is already the active user
+    if (activeUser !== user.UserID) {
+      console.log("New active user set:", user);
+      setActiveUser(user.UserID);
+    } else {
+      console.log("User already active.");
     }
   };
 
@@ -213,7 +219,6 @@ function Header() {
         >
           <AccountCircle />
         </IconButton>
-
         <p>Profile</p>
       </MenuItem>
     </Menu>
@@ -225,25 +230,14 @@ function Header() {
         userId: activeUser,
         message,
       });
-  
+
       if (response.status === 200) {
         console.log("Message sent successfully.");
-  
-        // Check if the user is already in the contacts list
-        const userInContacts = contacts.find(
-          (contact) => contact.UserID === activeUser
-        );
-  
-        if (!userInContacts) {
-          // Ensure selectActiveUser contains necessary fields
-          if (selectActiveUser) {
-            console.log("Adding new user to contacts:", selectActiveUser);
-            setContacts((prevContacts) => [...prevContacts, selectActiveUser]);
-          } else {
-            console.error("selectActiveUser is undefined or empty");
-          }
-        } else {
-          console.log("User already in contacts.");
+
+        // If the active user ID has changed, log it
+        if (selectActiveUser && activeUser !== selectActiveUser.UserID) {
+          console.log("Active user updated:", selectActiveUser);
+          setActiveUser(selectActiveUser.UserID);
         }
       } else {
         console.error("Failed to send message, response status:", response.status);
@@ -252,7 +246,10 @@ function Header() {
       console.error("Error sending message:", error);
     }
   };
-  
+
+  useEffect(()=>{
+    console.log("selectActiveUser", selectActiveUser);
+  }, [selectActiveUser]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
