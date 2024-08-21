@@ -148,9 +148,20 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
           flexGrow: 1,
           overflow: "auto",
           height: "250px",
-          // '&::-webkit-scrollbar': {
-          //   width: '1px',
-          // },
+          '&::-webkit-scrollbar': {
+            width: '0', 
+            transition: 'width 0.3s ease', 
+          },
+          '&:hover::-webkit-scrollbar': {
+            width: '6px', 
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#888', 
+            borderRadius: '10px', 
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#555', 
+          },
         }}
       >
         {" "}
