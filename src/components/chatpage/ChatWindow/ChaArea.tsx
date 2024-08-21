@@ -28,26 +28,26 @@ const ChatArea: React.FC<ChatAreaProps> = ({ userDetails }) => {
     setselectActiveUser,
   } = useUser();
 
-  useEffect(() => {
-    console.log("activeUser", selectActiveUser);
-    if (selectActiveUser) {
-      setSelectedUser(selectActiveUser);
-      setHeaderTitle(selectActiveUser.Username);
-    } else if (activeUser) {
-      const fetchUserDetails = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:3000/api/users/${activeUser}`
-          );
-          setSelectedUser(response.data);
-          setHeaderTitle(response.data.Username);
-        } catch (error) {
-          console.error("Error fetching user details:", error);
-        }
-      };
-      fetchUserDetails();
-    }
-  }, [selectActiveUser, activeUser]);
+  // useEffect(() => {
+  //   console.log("activeUser", selectActiveUser);
+  //   if (selectActiveUser) {
+  //     setSelectedUser(selectActiveUser);
+  //     setHeaderTitle(selectActiveUser.Username);
+  //   } else if (activeUser) {
+  //     const fetchUserDetails = async () => {
+  //       try {
+  //         const response = await axios.get(
+  //           `http://localhost:3000/api/users/${activeUser}`
+  //         );
+  //         setSelectedUser(response.data);
+  //         setHeaderTitle(response.data.Username);
+  //       } catch (error) {
+  //         console.error("Error fetching user details:", error);
+  //       }
+  //     };
+  //     fetchUserDetails();
+  //   }
+  // }, [selectActiveUser, activeUser]);
 
   useEffect(() => {
     console.log("activeUser", selectActiveUser);

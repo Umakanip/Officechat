@@ -98,6 +98,9 @@ const Header: React.FC<HeaderProps> = ({
     ScreenShared: boolean;
   } | null>(null);
 
+  const [showCallPopup, setShowCallPopup] = useState(false);
+
+
   var callerdetail;
   useEffect(() => {
     console.log("user?.userdata?.UserID", user?.userdata?.UserID);
@@ -135,6 +138,11 @@ const Header: React.FC<HeaderProps> = ({
       }
     });
 
+    if (incomingCall) {
+      setShowCallPopup(true);
+    }
+
+
     return () => {
       socket.off("incomingCall");
       socket.off("callAccepted");
@@ -151,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({
       setCallDuration((prevDuration) => prevDuration + 1);
     }, 1000);
   };
-  
+
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
@@ -159,6 +167,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const startCall = async () => {
+    console.log("selecteduser", selectedUser)
     if (!selectedUser) return; // Handle case where selectedUser might be null
 
     const generatedChannelName = "testChannel";
@@ -190,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({
       setCallData(callData);
 
       const response = await axios.post(
-        `http://localhost:3000/api/postCall?`,
+        `http://localhost:3000/api/postCall`,
         callData,
         {
           headers: {
@@ -205,12 +214,12 @@ const Header: React.FC<HeaderProps> = ({
   };
 
 
-  
   const handleCallAccepted = async () => {
     startCallTimer();
     try {
       setCallAccepted(true);
       setIsCallPopupVisible(false);
+      setShowCallPopup(false);
       socket.emit("callAccepted", { channelName, callerId: incomingCall });
 
       // Start the local audio track
@@ -219,21 +228,16 @@ const Header: React.FC<HeaderProps> = ({
       localAudioTrackRef.current = localAudioTrack;
       await rtcClient.publish([localAudioTrack]);
 
-      // Start the call duration timer
-      // setCallDuration(0); // Reset the timer
-      // callTimerRef.current = setInterval(() => {
-      //   setCallDuration((prevDuration) => prevDuration + 1);
-      // }, 1000);
-
     } catch (error) {
       console.error("Error accepting the call:", error);
     }
   };
 
- 
+
   const rejectCall = () => {
     if (incomingCall) {
       console.log("Call rejected");
+      // alert("call end");
       socket.emit("callRejected", { channelName, callerId: incomingCall });
       setIncomingCall(null);
       setChannelName("");
@@ -432,21 +436,105 @@ const Header: React.FC<HeaderProps> = ({
     setSuggestionsVisible(false);
   };
 
-
-  const endCall = () => {
+  const endCall = async () => {
     console.log("Ending call");
-    if (localAudioTrackRef.current) {
-      localAudioTrackRef.current.stop();
-      localAudioTrackRef.current = null;
-    }
-    rtcClient.leave(); // Leave the Agora channel
-    setCallAccepted(false);
-    setCallDuration(0);
-    if (callTimerRef.current) {
-      clearInterval(callTimerRef.current);
-      callTimerRef.current = null;
+    if (incomingCall) {
+      console.log("Call Ended");
+  
+      // Fetch the necessary data for the API call
+      const callerId = incomingCall;
+      const receiverId = ""; // Fetch the receiver ID from your application state or logic
+      const groupId = ""; // Fetch the group ID from your application state or logic
+      const startTime = ""; // Fetch the start time of the call from your application state or logic
+      const endTime = new Date().toISOString(); // Get the current time as the end time
+      const callType = ""; // Specify the call type (e.g., voice, video)
+      const screenShared = false; // Indicate whether the screen was shared during the call
+  
+      try {
+        // Make the API call to store the call data
+        const response = await axios.post("http://localhost:3000/api/postCall", {
+          CallerID: callerId,
+          ReceiverID: receiverId,
+          GroupID: groupId,
+          StartTime: startTime,
+          EndTime: endTime,
+          CallType: callType,
+          ScreenShared: screenShared,
+        });
+  
+        console.log("Call data stored:", response.data);
+  
+        // Reset the call-related state variables
+        socket.emit("CallEnded", { channelName, callerId: incomingCall });
+        setIncomingCall(null);
+        setChannelName("");
+        setToken("");
+        if (localAudioTrackRef.current) {
+          localAudioTrackRef.current.stop();
+          localAudioTrackRef.current = null;
+        }
+      } catch (err) {
+        console.error("Error storing call data:", err);
+      }
     }
   };
+
+  // const endCall = async () => {
+  //   console.log("Ending call");
+  //   if (incomingCall) {
+  //     console.log("Call Ended");
+  //     // Get the necessary data for the API call
+  //     const callerId = incomingCall;
+  //     const receiverId = ""; // Fetch the receiver ID from your application state or logic
+  //     const groupId = ""; // Fetch the group ID from your application state or logic
+  //     const startTime = ""; // Fetch the start time of the call from your application state or logic
+  //     const endTime = new Date().toISOString(); // Get the current time as the end time
+  //     const callType = ""; // Specify the call type (e.g., voice, video)
+  //     const screenShared = false; // Indicate whether the screen was shared during the call
+  
+  //     try {
+  //       // Make the API call to store the call data
+  //       const response = await axios.post("http://localhost:3000/api/postCall?", {
+  //         CallerID: callerId,
+  //         ReceiverID: receiverId,
+  //         GroupID: groupId,
+  //         StartTime: startTime,
+  //         EndTime: endTime,
+  //         CallType: callType,
+  //         ScreenShared: screenShared,
+  //       });
+  
+  //       console.log("Call data stored:", response.data);
+  
+  //       // Reset the call-related state variables
+  //       socket.emit("CallEnded", { channelName, callerId: incomingCall });
+  //       setIncomingCall(null);
+  //       setChannelName("");
+  //       setToken("");
+  //       if (localAudioTrackRef.current) {
+  //         localAudioTrackRef.current.stop();
+  //         localAudioTrackRef.current = null;
+  //       }
+  //     } catch (err) {
+  //       console.error("Error storing call data:", err);
+  //     }
+  //   }
+  // };
+  // const endCall = () => {
+  //   console.log("Ending call");
+  //   if (incomingCall) {
+  //     console.log("Call Ended");
+  //     // alert("call end");
+  //     socket.emit("CallEnded", { channelName, callerId: incomingCall });
+  //     setIncomingCall(null);
+  //     setChannelName("");
+  //     setToken("");
+  //     if (localAudioTrackRef.current) {
+  //       localAudioTrackRef.current.stop();
+  //       localAudioTrackRef.current = null;
+  //     }
+  //   }
+  // };
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
@@ -562,15 +650,16 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
               </AgoraRTCProvider> */}
 
+
               <AgoraRTCProvider client={rtcClient}>
                 <div>
                   <IconButton onClick={startCall}>
                     <CallIcon />
                   </IconButton>
 
-                  {incomingCall && (
+                  {showCallPopup && (
                     <CallPopup
-                      incomingCall={incomingCall}
+                      incomingCall={incomingCall!}
                       caller={callerdetail}
                       onAccept={handleCallAccepted}
                       onReject={rejectCall}
@@ -580,23 +669,64 @@ const Header: React.FC<HeaderProps> = ({
                   {callAccepted && channelName && token && (
                     <div>
                       <AgoraClient channelName={channelName} token={token} />
-                     <div>
-                     <div>Call Duration: {formatTime(callDuration)}</div>
-                      <IconButton
-                        // onClick={endCall} // Your function to end the call
-                        style={{
-                          backgroundColor: 'red',
-                          color: 'white',
-                        }}
-                      >
-                        <CallEndIcon />
-                      </IconButton>
-                     </div>
+
+                      <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 3, // You can adjust the gap value as needed
+                      }}>
+                        <div >Call Duration: {formatTime(callDuration)}</div>
+                        <IconButton
+                          onClick={() => endCall()} // Your function to end the call
+                          style={{
+                            backgroundColor: 'red',
+                            color: 'white',
+                            marginBottom:'20px',
+                          }}
+                        >
+                          <CallEndIcon />
+                        </IconButton>
+                      </Box>
+
                     </div>
                   )}
                 </div>
               </AgoraRTCProvider>
 
+
+              {/* <AgoraRTCProvider client={rtcClient}>
+                <div>
+                  <IconButton onClick={startCall}>
+                    <CallIcon />
+                  </IconButton>
+
+                  {showCallPopup && (
+                    <CallPopup
+                      onAccept={handleCallAccepted}
+                      onReject={rejectCall}
+                    />
+                  )}
+
+                  {callAccepted && channelName && token && (
+                    <div>
+                      <AgoraClient channelName={channelName} token={token} />
+                      <div>
+                        <div>Call Duration: {formatTime(callDuration)}</div>
+                        <IconButton
+                          onClick={endCall}
+                          style={{
+                            backgroundColor: 'red',
+                            color: 'white',
+                          }}
+                        >
+                          <CallEndIcon />
+                        </IconButton>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </AgoraRTCProvider> */}
               <IconButton
                 sx={{ marginLeft: "auto", color: "#1976d2" }}
                 onClick={handleVideoClick}
