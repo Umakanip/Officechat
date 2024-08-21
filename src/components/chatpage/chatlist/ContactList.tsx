@@ -55,7 +55,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
       .get(`http://localhost:3000/api/users/${user?.userdata?.UserID}`)
       .then((response) => {
         const users = response.data;
-        console.log(users.length);
+        console.log("contact", users);
 
         setContact(response.data);
         if (response.data.length > 0) {
@@ -92,7 +92,7 @@ const ContactList: React.FC<ContactListProps> = ({ onSelectUser }) => {
         const response = await axios.get(
           "http://localhost:3000/api/getActiveUser"
         );
-        console.log("responseresponse", response);
+
         setLoggedInUsers(response.data);
       }, 5000); // Send every 5 seconds
 

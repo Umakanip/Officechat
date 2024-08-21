@@ -116,8 +116,15 @@ const Footer: React.FC<FooterProps> = ({ userDetails, setMessageList }) => {
     socket.on("connect", () => {
       console.log("Connected to server:", socket.id);
     });
-    socket.on("disconnect", () => {
-      console.log("Disconnected from server");
+    socket.on("disconnect", async () => {
+      console.log("Connected to server:", socket.id);
+      // await axios
+      //   .post("http://localhost:3000/api/auth/logout", {
+      //     userId: user?.userdata?.UserID, // Pass the user ID in the request body
+      //   }) // Replace with your actual logout API endpoint
+      //   .catch((error: any) => {
+      //     console.error("Logout failed:", error);
+      //   });
     });
 
     const handleMessageReceive = (data) => {

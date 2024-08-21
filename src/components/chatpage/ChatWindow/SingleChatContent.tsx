@@ -32,14 +32,9 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
   userDetails,
   messageList = [], // Default to an empty array if messageList is undefined
 }) => {
-  console.log("Singlechatcom", messageList);
   const [open, setOpen] = React.useState(false);
   const [imagename, setImagename] = React.useState("");
-
-  useEffect(() => {
-    console.log("messageList", messageList);
-    console.log(messageList.length);
-  }, [messageList]);
+  // const [loading, setLoading] = React.useState<boolean>(true);
 
   const handleOpen = (filename: string) => {
     setImagename(filename);
@@ -67,6 +62,14 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
     >
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {/* {messageList.length > 0 ? ( */}
+        {/* {loading && messageList.length === 0 ? (
+          <Typography
+            variant="body1"
+            sx={{ p: 2, textAlign: "center", mb: "150px" }}
+          >
+            Loading...
+          </Typography>
+        ) : ( */}
         <List>
           {messageList.map((messageContent, index) => {
             const isSender = userDetails.UserID === messageContent.SenderID;
@@ -123,7 +126,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                 key={index}
                 style={{
                   display: "flex",
-                  justifyContent: isSender ? "flex-end" : "flex-start",
+                  justifyContent: isSender ? "flex-start" : "flex-end",
                   padding: "0px",
                 }}
               >
@@ -134,7 +137,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
                     borderRadius: "10px",
                     backgroundColor: isSender ? "#f1f0f0" : "#e1ffc7",
                     boxShadow: 2,
-                    textAlign: isSender ? "left" : "left",
+                    textAlign: isSender ? "left" : "right",
                     margin: "5px",
                   }}
                 >
@@ -180,6 +183,7 @@ const SingleChatContent: React.FC<SingleChatContentProps> = ({
             );
           })}
         </List>
+        {/* )} */}
         {/* // ) : (
         //   <Box>
         //     <h1>There is no conversation in this Chat</h1>

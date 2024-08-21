@@ -35,7 +35,7 @@ import AgoraRTC, {
   IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng";
 // import { IconButton } from '@mui/material';
-import CallEndIcon from '@mui/icons-material/CallEnd';
+import CallEndIcon from "@mui/icons-material/CallEnd";
 
 const socket = io("http://localhost:5000");
 const rtcClient: any = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
@@ -43,11 +43,11 @@ const rtcClient: any = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 interface HeaderProps {
   selectedUser: User;
   onGroupCreate;
-  headerTitle: string | undefined;
+  Title: string | null;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  headerTitle,
+  Title,
   selectedUser,
   onGroupCreate,
 }) => {
@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({
     title: "",
     description: "",
     actionText: "",
-    onConfirm: () => { },
+    onConfirm: () => {},
   });
 
   const {
@@ -74,6 +74,7 @@ const Header: React.FC<HeaderProps> = ({
     setActiveUser,
     setselectActiveUser,
     user,
+    headerTitle,
   } = useUser();
   const [channelName, setChannelName] = useState<string>("");
   const [token, setToken] = useState<string>("");
@@ -102,8 +103,8 @@ const Header: React.FC<HeaderProps> = ({
 
 
   var callerdetail;
+
   useEffect(() => {
-    console.log("user?.userdata?.UserID", user?.userdata?.UserID);
     socket.emit("register", user?.userdata?.UserID);
 
     socket.on(
@@ -160,10 +161,14 @@ const Header: React.FC<HeaderProps> = ({
     }, 1000);
   };
 
+
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}`;
   };
 
   const startCall = async () => {
@@ -214,6 +219,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
 
+
   const handleCallAccepted = async () => {
     startCallTimer();
     try {
@@ -232,6 +238,7 @@ const Header: React.FC<HeaderProps> = ({
       console.error("Error accepting the call:", error);
     }
   };
+
 
 
   const rejectCall = () => {
@@ -300,51 +307,6 @@ const Header: React.FC<HeaderProps> = ({
       setSuggestionsVisible(false);
     }
   };
-
-  // const handleCreateGroup = async () => {
-  //   // Handle the "Create" button logic here
-  //   console.log("Email:Email:", selectedUserIDs);
-  //   console.log("Email:", (selectedUser as User).UserID || null);
-  //   const namesArray = query
-  //     .split(",")
-  //     .map((name) => name.trim())
-  //     .filter((name) => name.length > 0);
-  //   const groupname = [(selectedUser as User).Username, ...namesArray].join(
-  //     ", "
-  //   );
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:3000/api/creategroup?`,
-  //       {
-  //         // Email: groupEmail,
-  //         GroupName: groupname,
-  //         Username: [(selectedUser as User).Username, ...namesArray],
-  //         CreatedBy: (selectedUser as User).UserID || null,
-  //         CreatedAt: new Date(),
-  //       },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     console.log("REsponse", response.data);
-  //     setGroupDetails(response.data);
-  //     const newGroup = response.data;
-
-  //     setGroups((prevGroups) => [newGroup, ...prevGroups]);
-  //     setActiveGroup(response.data.GroupID);
-  //     setActiveUser(null);
-  //     setselectActiveUser(null);
-  //     onGroupCreate(newGroup); // Pass the new group information
-  //     setQuery(""); // Clear the input
-
-  //     handlePopoverClose(); // Close the popover after action
-  //     // setHeaderTitle(response.data.group.GroupName);
-  //   } catch (error: any) {
-  //     console.error("Error sending data:", error);
-  //   }
-  // };
 
   const handleCreateGroup = async () => {
     console.log("Selected User IDs:", selectedUserIDs);
@@ -415,8 +377,7 @@ const Header: React.FC<HeaderProps> = ({
           },
         }
       );
-      console.log("REsponse", response.data.insertedMembers[0].Username);
-      console.log("REsponse", response.data.group);
+
       const updatedGroup = response.data.group;
       setGroupDetails(updatedGroup); // Update with new group details
       setActiveGroup(updatedGroup.GroupID); // Ensure active group is updated
@@ -429,61 +390,18 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const handleSelectUser = (username) => {
-    console.log("User selected:", username);
     setQuery(username);
     setSelectedUserIDs(username);
     setSuggestions([]);
     setSuggestionsVisible(false);
   };
 
-  const endCall = async () => {
-    console.log("Ending call");
-    if (incomingCall) {
-      console.log("Call Ended");
-  
-      // Fetch the necessary data for the API call
-      const callerId = incomingCall;
-      const receiverId = ""; // Fetch the receiver ID from your application state or logic
-      const groupId = ""; // Fetch the group ID from your application state or logic
-      const startTime = ""; // Fetch the start time of the call from your application state or logic
-      const endTime = new Date().toISOString(); // Get the current time as the end time
-      const callType = ""; // Specify the call type (e.g., voice, video)
-      const screenShared = false; // Indicate whether the screen was shared during the call
-  
-      try {
-        // Make the API call to store the call data
-        const response = await axios.post("http://localhost:3000/api/postCall", {
-          CallerID: callerId,
-          ReceiverID: receiverId,
-          GroupID: groupId,
-          StartTime: startTime,
-          EndTime: endTime,
-          CallType: callType,
-          ScreenShared: screenShared,
-        });
-  
-        console.log("Call data stored:", response.data);
-  
-        // Reset the call-related state variables
-        socket.emit("CallEnded", { channelName, callerId: incomingCall });
-        setIncomingCall(null);
-        setChannelName("");
-        setToken("");
-        if (localAudioTrackRef.current) {
-          localAudioTrackRef.current.stop();
-          localAudioTrackRef.current = null;
-        }
-      } catch (err) {
-        console.error("Error storing call data:", err);
-      }
-    }
-  };
-
   // const endCall = async () => {
   //   console.log("Ending call");
   //   if (incomingCall) {
   //     console.log("Call Ended");
-  //     // Get the necessary data for the API call
+  
+  //     // Fetch the necessary data for the API call
   //     const callerId = incomingCall;
   //     const receiverId = ""; // Fetch the receiver ID from your application state or logic
   //     const groupId = ""; // Fetch the group ID from your application state or logic
@@ -494,7 +412,7 @@ const Header: React.FC<HeaderProps> = ({
   
   //     try {
   //       // Make the API call to store the call data
-  //       const response = await axios.post("http://localhost:3000/api/postCall?", {
+  //       const response = await axios.post("http://localhost:3000/api/postCall", {
   //         CallerID: callerId,
   //         ReceiverID: receiverId,
   //         GroupID: groupId,
@@ -520,21 +438,22 @@ const Header: React.FC<HeaderProps> = ({
   //     }
   //   }
   // };
-  // const endCall = () => {
-  //   console.log("Ending call");
-  //   if (incomingCall) {
-  //     console.log("Call Ended");
-  //     // alert("call end");
-  //     socket.emit("CallEnded", { channelName, callerId: incomingCall });
-  //     setIncomingCall(null);
-  //     setChannelName("");
-  //     setToken("");
-  //     if (localAudioTrackRef.current) {
-  //       localAudioTrackRef.current.stop();
-  //       localAudioTrackRef.current = null;
-  //     }
-  //   }
-  // };
+
+
+  const endCall = () => {
+    if (incomingCall) {
+      console.log("Call rejected");
+      // alert("call end");
+      socket.emit("callRejected", { channelName, callerId: incomingCall });
+      setIncomingCall(null);
+      setChannelName("");
+      setToken("");
+      if (localAudioTrackRef.current) {
+        localAudioTrackRef.current.stop();
+        localAudioTrackRef.current = null;
+      }
+    }
+  };
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
@@ -585,8 +504,8 @@ const Header: React.FC<HeaderProps> = ({
     setOpenModal(true);
   };
   const [secondary, setSecondary] = React.useState(false);
-
-
+  console.log("userDetails", selectedUser);
+  console.log("userDetails", headerTitle);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -613,9 +532,18 @@ const Header: React.FC<HeaderProps> = ({
                   sx={{ mr: 2 }}
                 />
                 <Typography variant="h6" color="white">
-                  {selectedUser.UserID
+                  {headerTitle
+                    ? headerTitle
+                    : selectedUser.UserID
                     ? selectedUser.Username
                     : selectedUser.GroupName}
+                  {/* {selectedUser
+                    ? selectedUser.UserID
+                      ? selectedUser.Username
+                      : selectedUser.GroupName
+                      ? selectedUser.GroupName
+                      : headerTitle
+                    : headerTitle} */}
                 </Typography>
               </Box>
               {/* <GroupIcon
@@ -623,32 +551,6 @@ const Header: React.FC<HeaderProps> = ({
               sx={{ color: "black" }}
               onClick={handleDialogOpen} // Open dialog on click
             /> */}
-
-              {/* <IconButton
-                onClick={startCall}
-                sx={{ marginLeft: "0px", color: "#1976d2" }}
-              >
-                <CallIcon />
-              </IconButton> */}
-              {/* <AgoraRTCProvider client={rtcClient}>
-                <div>
-                  <IconButton onClick={startCall}>
-                    <CallIcon />
-                  </IconButton>
-                  {incomingCall && (
-                    <CallPopup
-                      incomingCall={incomingCall}
-                      caller={callerdetail} // Ensure caller is of type User | null
-                      onAccept={handleCallAccepted}
-                      onReject={rejectCall}
-                    />
-                  )}
-
-                  {callAccepted && channelName && token && (
-                    <AgoraClient channelName={channelName} token={token} />
-                  )}
-                </div>
-              </AgoraRTCProvider> */}
 
 
               <AgoraRTCProvider client={rtcClient}>
@@ -727,6 +629,7 @@ const Header: React.FC<HeaderProps> = ({
                   )}
                 </div>
               </AgoraRTCProvider> */}
+
               <IconButton
                 sx={{ marginLeft: "auto", color: "#1976d2" }}
                 onClick={handleVideoClick}
@@ -869,12 +772,12 @@ const Header: React.FC<HeaderProps> = ({
                         )
                       }
 
-                    // onClick={() =>
-                    //   handleDelete(
-                    //     user?.userdata?.UserID,
-                    //     selectedUser.GroupID
-                    //   )
-                    // }
+                      // onClick={() =>
+                      //   handleDelete(
+                      //     user?.userdata?.UserID,
+                      //     selectedUser.GroupID
+                      //   )
+                      // }
                     >
                       <ListItemAvatar>
                         <Avatar>
